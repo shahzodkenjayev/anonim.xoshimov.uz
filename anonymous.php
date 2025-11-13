@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($employee_id > 0) {
         // Bu browser'dan bu xodimga allaqachon ovoz berilganmi?
         if (in_array($employee_id, $_SESSION[$session_key])) {
-            $message = 'Siz bu xodimga allaqachon ovoz bergansiz!';
+            $message = t('already_voted');
             $message_type = 'error';
         } else {
             // Javoblarni saqlash (anonim, user_id = NULL)
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION[$session_key][] = $employee_id;
                 
                 $conn->commit();
-                $message = 'Ovozingiz muvaffaqiyatli qabul qilindi! Rahmat!';
+                $message = t('vote_success');
                 $message_type = 'success';
             } catch (Exception $e) {
                 $conn->rollBack();
@@ -89,9 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="header">
         <div class="container">
-            <h1>Anonim Ovoz Berish</h1>
+            <h1><?php echo t('anonymous_vote'); ?></h1>
             <div class="user-info">
-                <a href="index.php" class="btn btn-secondary">← Asosiy sahifa</a>
+                <a href="index.php" class="btn btn-secondary">← <?php echo t('home_page'); ?></a>
             </div>
         </div>
     </div>
@@ -99,15 +99,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <div class="anonymous-info">
             <div class="alert alert-info">
-                <strong>ℹ️ Anonimlik:</strong> Sizning ovozingiz to'liq anonim. Login qilish shart emas. 
-                Har bir xodimga faqat bir marta ovoz bera olasiz.
+                <?php echo t('anonymity_info'); ?>
             </div>
-            <div class="language-selector" style="text-align: right; margin-top: 10px;">
-                <label for="lang-select">Til / Язык:</label>
-                <select id="lang-select" onchange="window.location.href='?lang=' + this.value" style="padding: 5px 10px; margin-left: 10px; border-radius: 5px;">
-                    <option value="uz" <?php echo $current_lang === 'uz' ? 'selected' : ''; ?>>O'zbek</option>
-                    <option value="ru" <?php echo $current_lang === 'ru' ? 'selected' : ''; ?>>Русский</option>
-                </select>
+        </div>
+        
+        <div class="language-selector-top">
+            <div class="lang-switcher">
+                <a href="?lang=uz" class="lang-option <?php echo $current_lang === 'uz' ? 'active' : ''; ?>">
+                    <span class="flag-icon"><?php echo getFlagSvg('uz'); ?></span>
+                    <span>O'zbek</span>
+                </a>
+                <a href="?lang=ru" class="lang-option <?php echo $current_lang === 'ru' ? 'active' : ''; ?>">
+                    <span class="flag-icon"><?php echo getFlagSvg('ru'); ?></span>
+                    <span>Русский</span>
+                </a>
             </div>
         </div>
         
@@ -116,40 +121,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         
         <div class="survey-section">
-            <h2>Xodimlarni baholash</h2>
-            <p class="info-text">Quyidagi xodimlar haqida anonim so'rovnoma to'ldiring.</p>
+            <h2><?php echo t('rate_employees'); ?></h2>
+            <p class="info-text"><?php echo t('rate_employees_desc'); ?></p>
             
             <!-- Qidirish va filtrlash paneli -->
             <div class="filter-panel">
                 <div class="filter-row">
                     <div class="filter-group">
-                        <label for="search-input">🔍 Xodimni qidirish:</label>
-                        <input type="text" id="search-input" class="form-control" placeholder="Ism yoki familiya bo'yicha qidiring...">
+                        <label for="search-input">🔍 <?php echo t('search_employee'); ?></label>
+                        <input type="text" id="search-input" class="form-control" placeholder="<?php echo t('search_placeholder'); ?>">
                     </div>
                     <div class="filter-group">
-                        <label for="position-filter">📋 Lavozim:</label>
+                        <label for="position-filter">📋 <?php echo t('position'); ?></label>
                         <select id="position-filter" class="form-control">
-                            <option value="">Barcha lavozimlar</option>
-                            <option value="teacher">O'qituvchi</option>
-                            <option value="dean">Dekan</option>
-                            <option value="coordinator">Koordinator</option>
+                            <option value=""><?php echo t('all_positions'); ?></option>
+                            <option value="teacher"><?php echo t('teacher'); ?></option>
+                            <option value="dean"><?php echo t('dean'); ?></option>
+                            <option value="coordinator"><?php echo t('coordinator'); ?></option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label for="department-filter">🏛️ Kafedra:</label>
+                        <label for="department-filter">🏛️ <?php echo t('department'); ?></label>
                         <select id="department-filter" class="form-control">
-                            <option value="">Barcha kafedralar</option>
+                            <option value=""><?php echo t('all_departments'); ?></option>
                             <?php foreach ($departments as $dept): ?>
                                 <option value="<?php echo htmlspecialchars($dept); ?>"><?php echo htmlspecialchars($dept); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <button type="button" id="clear-filters" class="btn btn-secondary">Tozalash</button>
+                        <button type="button" id="clear-filters" class="btn btn-secondary"><?php echo t('clear'); ?></button>
                     </div>
                 </div>
                 <div class="filter-results">
-                    <span id="results-count"><?php echo count($employees); ?> ta xodim topildi</span>
+                    <span id="results-count"><?php echo count($employees); ?> <?php echo t('employees_found'); ?></span>
                 </div>
             </div>
             
@@ -204,13 +209,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
                                 <?php endforeach; ?>
                                 
-                                <button type="submit" class="btn btn-primary">Ovoz Berish</button>
+                                <button type="submit" class="btn btn-primary"><?php echo t('vote_submit'); ?></button>
                             </form>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <div class="alert alert-info">Hozircha xodimlar ro'yxati bo'sh.</div>
+                <div class="alert alert-info"><?php echo t('no_employees'); ?></div>
             <?php endif; ?>
         </div>
     </div>
@@ -255,7 +260,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
             
             // Natijalar sonini yangilash
-            resultsCount.textContent = visibleCount + ' ta xodim topildi';
+            const lang = '<?php echo $current_lang; ?>';
+            const foundText = lang === 'ru' ? 'сотрудников найдено' : 'ta xodim topildi';
+            resultsCount.textContent = visibleCount + ' ' + foundText;
             
             // Agar hech narsa topilmasa, xabar ko'rsatish
             if (visibleCount === 0) {
@@ -264,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     const message = document.createElement('div');
                     message.id = 'no-results-message';
                     message.className = 'alert alert-info';
-                    message.textContent = 'Hech qanday xodim topilmadi. Filtrlarni o\'zgartiring.';
+                    message.textContent = lang === 'ru' ? 'Сотрудники не найдены. Измените фильтры.' : 'Hech qanday xodim topilmadi. Filtrlarni o\'zgartiring.';
                     document.querySelector('.survey-section').appendChild(message);
                 }
             } else {

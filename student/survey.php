@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $check_result = $check_stmt->fetch();
         
         if ($check_result) {
-            $message = 'Siz bu xodimga allaqachon javob bergansiz!';
+            $message = t('already_voted');
             $message_type = 'error';
         } else {
             // Javoblarni saqlash
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $submission_stmt->execute([$user_id, $employee_id]);
                 
                 $conn->commit();
-                $message = 'So\'rovnoma muvaffaqiyatli topshirildi! Rahmat!';
+                $message = t('vote_success');
                 $message_type = 'success';
             } catch (Exception $e) {
                 $conn->rollBack();
@@ -109,16 +109,22 @@ $submitted_employees = $submitted_result;
             <div class="alert alert-<?php echo $message_type; ?>"><?php echo $message; ?></div>
         <?php endif; ?>
         
-        <div class="survey-section">
-            <h2>Xodimlarni baholash</h2>
-            <p class="info-text">Quyidagi xodimlar haqida anonim so'rovnoma to'ldiring. Har bir xodimga faqat bir marta javob bera olasiz.</p>
-            <div class="language-selector" style="text-align: right; margin-bottom: 20px;">
-                <label for="lang-select">Til / Язык:</label>
-                <select id="lang-select" onchange="window.location.href='?lang=' + this.value" style="padding: 5px 10px; margin-left: 10px; border-radius: 5px;">
-                    <option value="uz" <?php echo $current_lang === 'uz' ? 'selected' : ''; ?>>O'zbek</option>
-                    <option value="ru" <?php echo $current_lang === 'ru' ? 'selected' : ''; ?>>Русский</option>
-                </select>
+        <div class="language-selector-top">
+            <div class="lang-switcher">
+                <a href="?lang=uz" class="lang-option <?php echo $current_lang === 'uz' ? 'active' : ''; ?>">
+                    <span class="flag-icon"><?php echo getFlagSvg('uz'); ?></span>
+                    <span>O'zbek</span>
+                </a>
+                <a href="?lang=ru" class="lang-option <?php echo $current_lang === 'ru' ? 'active' : ''; ?>">
+                    <span class="flag-icon"><?php echo getFlagSvg('ru'); ?></span>
+                    <span>Русский</span>
+                </a>
             </div>
+        </div>
+        
+        <div class="survey-section">
+            <h2><?php echo t('rate_employees'); ?></h2>
+            <p class="info-text"><?php echo t('rate_employees_desc'); ?></p>
             
             <?php if (count($employees) > 0): ?>
                 <?php foreach ($employees as $employee): ?>
@@ -168,13 +174,13 @@ $submitted_employees = $submitted_result;
                                     </div>
                                 <?php endforeach; ?>
                                 
-                                <button type="submit" class="btn btn-primary">Topshirish</button>
+                                <button type="submit" class="btn btn-primary"><?php echo t('submit'); ?></button>
                             </form>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <div class="alert alert-info">Hozircha xodimlar ro'yxati bo'sh.</div>
+                <div class="alert alert-info"><?php echo t('no_employees'); ?></div>
             <?php endif; ?>
         </div>
     </div>

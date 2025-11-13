@@ -2,6 +2,12 @@
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
+// Tilni o'rnatish (GET parametri orqali)
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['uz', 'ru'])) {
+    setUserLanguage($_GET['lang']);
+}
+$current_lang = getUserLanguage();
+
 // Agar login qilgan bo'lsa, tegishli sahifaga yo'naltirish
 if (isLoggedIn()) {
     if (isAdmin()) {
@@ -13,53 +19,72 @@ if (isLoggedIn()) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="<?php echo $current_lang; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anonim So'rovnoma Platformasi</title>
+    <title><?php echo t('site_title'); ?></title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+    <div class="language-selector-top">
+        <div class="container">
+            <div class="lang-switcher">
+                <a href="?lang=uz" class="lang-option <?php echo $current_lang === 'uz' ? 'active' : ''; ?>">
+                    <span class="flag-icon"><?php echo getFlagSvg('uz'); ?></span>
+                    <span>O'zbek</span>
+                </a>
+                <a href="?lang=ru" class="lang-option <?php echo $current_lang === 'ru' ? 'active' : ''; ?>">
+                    <span class="flag-icon"><?php echo getFlagSvg('ru'); ?></span>
+                    <span>Русский</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <div class="home-page">
             <div class="hero-section">
-                <h1>Anonim So'rovnoma Platformasi</h1>
-                <p class="subtitle">O'qituvchilar, dekanlar va koordinatorlar haqida fikringizni bildiring</p>
+                <h1><?php echo t('site_title'); ?></h1>
+                <p class="subtitle"><?php echo t('site_subtitle'); ?></p>
             </div>
             
             <div class="options-grid">
                 <div class="option-card">
                     <div class="option-icon">🗳️</div>
-                    <h2>Anonim Ovoz Berish</h2>
-                    <p>Xodimlar haqida anonim so'rovnoma to'ldiring. Login qilish shart emas.</p>
-                    <a href="anonymous.php" class="btn btn-primary btn-large">Ovoz Berish</a>
+                    <h2><?php echo t('anonymous_vote'); ?></h2>
+                    <p><?php echo t('anonymous_vote_desc'); ?></p>
+                    <a href="anonymous.php" class="btn btn-primary btn-large"><?php echo t('vote_button'); ?></a>
                 </div>
                 
                 <div class="option-card">
                     <div class="option-icon">🔐</div>
-                    <h2>Tizimga Kirish</h2>
-                    <p>Talaba yoki admin hisobi bilan tizimga kiring va batafsil so'rovnoma to'ldiring.</p>
-                    <a href="student/login.php" class="btn btn-secondary btn-large">Kirish</a>
+                    <h2><?php echo t('login'); ?></h2>
+                    <p><?php echo t('login_desc'); ?></p>
+                    <a href="student/login.php" class="btn btn-secondary btn-large"><?php echo t('login_button'); ?></a>
                 </div>
             </div>
             
             <div class="info-section">
-                <h3>Qanday Ishlaydi?</h3>
+                <h3><?php echo t('how_it_works'); ?></h3>
                 <div class="info-grid">
                     <div class="info-item">
-                        <strong>1. Anonim Ovoz Berish</strong>
-                        <p>Login qilmasdan, to'g'ridan-to'g'ri xodimlarni baholash. Sizning shaxsingiz aniq qilinmaydi.</p>
+                        <strong><?php echo t('step1_title'); ?></strong>
+                        <p><?php echo t('step1_desc'); ?></p>
                     </div>
                     <div class="info-item">
-                        <strong>2. Tizimga Kirish</strong>
-                        <p>Talaba hisobi bilan kirib, batafsil so'rovnoma to'ldiring. Har bir xodimga bir marta javob bera olasiz.</p>
+                        <strong><?php echo t('step2_title'); ?></strong>
+                        <p><?php echo t('step2_desc'); ?></p>
                     </div>
                     <div class="info-item">
-                        <strong>3. Admin Panel</strong>
-                        <p>Adminlar natijalarni ko'rish va boshqarish uchun alohida sahifadan kirishadi.</p>
+                        <strong><?php echo t('step3_title'); ?></strong>
+                        <p><?php echo t('step3_desc'); ?></p>
                     </div>
                 </div>
+            </div>
+            
+            <div class="login-links">
+                <p><?php echo t('admin_login'); ?> <a href="admin/login.php"><?php echo t('admin_panel'); ?></a></p>
             </div>
         </div>
     </div>

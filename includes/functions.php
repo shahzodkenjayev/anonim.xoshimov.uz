@@ -57,5 +57,37 @@ function getUserLanguage() {
 function setUserLanguage($lang) {
     $_SESSION['language'] = $lang;
 }
+
+// Tarjima olish funksiyasi
+function t($key, $lang = null) {
+    if ($lang === null) {
+        $lang = getUserLanguage();
+    }
+    
+    $translationFile = __DIR__ . '/translations/' . $lang . '.php';
+    
+    if (file_exists($translationFile)) {
+        $translations = require $translationFile;
+        return $translations[$key] ?? $key;
+    }
+    
+    // Fallback to Uzbek
+    $uzFile = __DIR__ . '/translations/uz.php';
+    if (file_exists($uzFile)) {
+        $translations = require $uzFile;
+        return $translations[$key] ?? $key;
+    }
+    
+    return $key;
+}
+
+// Bayroq SVG olish
+function getFlagSvg($lang) {
+    $flagPath = __DIR__ . '/../assets/images/flags/' . $lang . '.svg';
+    if (file_exists($flagPath)) {
+        return file_get_contents($flagPath);
+    }
+    return '';
+}
 ?>
 
