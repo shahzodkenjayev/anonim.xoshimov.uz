@@ -41,48 +41,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
         if ($handle !== false) {
             $conn->beginTransaction();
             $line_number = 0;
+            $delimiter = ',';
             
             try {
-                // Birinchi qatorni o'tkazib yuborish (header)
-                fgetcsv($handle);
+                // Birinchi qatorni o'qib, delimiter'ni aniqlash
+                $first_line = fgets($handle);
+                rewind($handle);
                 
-                while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                    $line_number++;
-                    
-                    if (count($data) < 3) {
-                        $errors[] = "Qator $line_number: Yetarli ma'lumot yo'q";
-                        continue;
-                    }
-                    
-                    $full_name = trim($data[0] ?? '');
-                    $department_uz = trim($data[1] ?? '');
-                    $department_ru = trim($data[2] ?? '');
-                    
-                    if (empty($full_name)) {
-                        $errors[] = "Qator $line_number: Ism bo'sh";
-                        continue;
-                    }
-                    
-                    // Xodim mavjudligini tekshirish
-                    $check_stmt = $conn->prepare("SELECT id FROM employees WHERE full_name = ?");
-                    $check_stmt->execute([$full_name]);
-                    $exists = $check_stmt->fetch();
-                    
-                    if ($exists) {
-                        $errors[] = "Qator $line_number: '$full_name' allaqachon mavjud";
-                        continue;
-                    }
-                    
-                    // Xodimni qo'shish (teacher pozitsiyasi)
-                    $insert_stmt = $conn->prepare("INSERT INTO employees (full_name, position, department_uz, department_ru) VALUES (?, 'teacher', ?, ?)");
-                    $insert_stmt->execute([$full_name, $department_uz, $department_ru]);
-                    
-                    $imported_count++;
+                // Delimiter'ni aniqlash (vergul, nuqta-vergul, tab)
+                if (strpos($first_line, ';') !== false && substr_count($first_line, ';') >= 2) {
+                    $delimiter = ';';
+                } elseif (strpos($first_line, "\t") !== false && substr_count($first_line, "\t") >= 2) {
+                    $delimiter = "\t";
                 }
                 
-                $conn->commit();
-                $message = "Muvaffaqiyatli! $imported_count ta o'qituvchi import qilindi.";
-                $message_type = 'success';
+                // Birinchi qatorni o'tkazib yuborish (header)
+                $header = fgetcsv($handle, 0, $delimiter);
+                
+                // Header'ni tekshirish
+                if (count($header) < 3) {
+                    $message = "CSV fayl formati noto'g'ri! Kamida 3 ta ustun bo'lishi kerak (Ism, Kafedra UZ, Kafedra RU).";
+                    $message_type = 'error';
+                } else {
+                    while (($data = fgetcsv($handle, 0, $delimiter)) !== false) {
+                        $line_number++;
+                        
+                        // Bo'sh qatorlarni o'tkazib yuborish
+                        if (empty(array_filter($data))) {
+                            continue;
+                        }
+                        
+                        if (count($data) < 3) {
+                            $errors[] = "Qator $line_number: Yetarli ma'lumot yo'q (topildi: " . count($data) . " ta ustun, kerak: 3 ta). Ma'lumotlar: " . implode(' | ', $data);
+                            continue;
+                        }
+                        
+                        $full_name = trim($data[0] ?? '');
+                        $department_uz = trim($data[1] ?? '');
+                        $department_ru = trim($data[2] ?? '');
+                        
+                        if (empty($full_name)) {
+                            $errors[] = "Qator $line_number: Ism bo'sh";
+                            continue;
+                        }
+                        
+                        // Xodim mavjudligini tekshirish
+                        $check_stmt = $conn->prepare("SELECT id FROM employees WHERE full_name = ?");
+                        $check_stmt->execute([$full_name]);
+                        $exists = $check_stmt->fetch();
+                        
+                        if ($exists) {
+                            $errors[] = "Qator $line_number: '$full_name' allaqachon mavjud";
+                            continue;
+                        }
+                        
+                        // Xodimni qo'shish (teacher pozitsiyasi)
+                        $insert_stmt = $conn->prepare("INSERT INTO employees (full_name, position, department_uz, department_ru) VALUES (?, 'teacher', ?, ?)");
+                        $insert_stmt->execute([$full_name, $department_uz, $department_ru]);
+                        
+                        $imported_count++;
+                    }
+                    
+                    $conn->commit();
+                    if ($imported_count > 0) {
+                        $message = "Muvaffaqiyatli! $imported_count ta o'qituvchi import qilindi.";
+                        $message_type = 'success';
+                    } else {
+                        $message = "Hech qanday ma'lumot import qilinmadi. CSV fayl formatini tekshiring.";
+                        $message_type = 'error';
+                    }
+                }
                 
             } catch (Exception $e) {
                 $conn->rollBack();
@@ -142,16 +170,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             <h2>CSV Fayldan Import</h2>
             <p><strong>Talablar:</strong></p>
             <ol>
-                <li>Excel faylni CSV formatiga o'tkazing (File > Save As > CSV UTF-8)</li>
+                <li>Excel faylni CSV formatiga o'tkazing: <strong>File > Save As > CSV UTF-8 (Comma delimited)</strong></li>
                 <li>CSV fayl format: <code>A ustun: Ism, B ustun: Kafedra (UZ), C ustun: Kafedra (RU)</code></li>
                 <li>Birinchi qator header bo'lishi kerak (o'tkazib yuboriladi)</li>
+                <li><strong>Muhim:</strong> CSV fayl UTF-8 encoding'da bo'lishi kerak!</li>
             </ol>
+            
+            <div class="alert alert-info">
+                <strong>CSV Fayl Format Namunasi:</strong><br>
+                <code style="display: block; padding: 10px; background: #f0f0f0; border-radius: 5px; margin-top: 10px;">
+                Full Name,Kafedra (UZ),Kafedra (RU)<br>
+                Abdullayev Alisher Valiyevich,Axborot texnologiyalari,Информационные технологии<br>
+                Karimov Bahodir Toshmatovich,Dasturlash,Программирование
+                </code>
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>⚠️ CSV Fayl Formatini Tekshirish:</strong><br>
+                Agar import ishlamasa, <a href="test_csv.php" target="_blank">test_csv.php</a> faylini ishlatib, CSV fayl formatini tekshiring.
+            </div>
             
             <form method="POST" enctype="multipart/form-data" class="upload-form">
                 <div class="form-group">
                     <label for="csv_file">CSV Fayl Tanlang:</label>
                     <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
-                    <small>Faqat CSV fayllar (.csv)</small>
+                    <small>Faqat CSV fayllar (.csv). UTF-8 encoding bo'lishi kerak.</small>
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Import Qilish</button>
