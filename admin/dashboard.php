@@ -73,8 +73,47 @@ $stats = $stats_result->fetch();
         
         <div class="admin-section">
             <h2>Xodimlar</h2>
+            
+            <!-- Qidirish paneli -->
+            <div class="filter-panel">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="search-input">🔍 Xodimni qidirish:</label>
+                        <input type="text" id="search-input" class="form-control" placeholder="Ism yoki familiya bo'yicha qidiring...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="position-filter">Lavozim:</label>
+                        <select id="position-filter" class="form-control">
+                            <option value="">Barcha lavozimlar</option>
+                            <option value="teacher">O'qituvchi</option>
+                            <option value="dean">Dekan</option>
+                            <option value="coordinator">Koordinator</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="department-filter">Kafedra/Fakultet:</label>
+                        <select id="department-filter" class="form-control">
+                            <option value="">Barcha kafedralar</option>
+                            <?php
+                            $all_departments_query = "SELECT DISTINCT department_uz FROM employees WHERE department_uz IS NOT NULL AND department_uz != '' ORDER BY department_uz";
+                            $all_departments_result = $conn->query($all_departments_query);
+                            $all_departments = $all_departments_result->fetchAll(PDO::FETCH_COLUMN);
+                            foreach ($all_departments as $dept):
+                            ?>
+                                <option value="<?php echo htmlspecialchars($dept); ?>"><?php echo htmlspecialchars($dept); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="filter-buttons">
+                        <button type="button" id="search-btn" class="btn btn-primary">Qidirish</button>
+                        <button type="button" id="reset-btn" class="btn btn-secondary">Tozalash</button>
+                    </div>
+                </div>
+                <div class="filter-results" id="filter-results"></div>
+            </div>
+            
             <?php if (count($employees) > 0): ?>
-                <table class="data-table">
+                <table class="data-table" id="employees-table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -84,9 +123,11 @@ $stats = $stats_result->fetch();
                             <th>Amallar</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="employees-tbody">
                         <?php foreach ($employees as $employee): ?>
-                            <tr>
+                            <tr data-name="<?php echo htmlspecialchars(strtolower($employee['full_name'])); ?>" 
+                                data-position="<?php echo $employee['position']; ?>" 
+                                data-department="<?php echo htmlspecialchars(strtolower($employee['department_uz'] ?? '')); ?>">
                                 <td><?php echo $employee['id']; ?></td>
                                 <td><?php echo htmlspecialchars($employee['full_name']); ?></td>
                                 <td><?php echo getPositionName($employee['position']); ?></td>
@@ -98,11 +139,110 @@ $stats = $stats_result->fetch();
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                <div id="no-results-message" style="display: none; text-align: center; padding: 20px; color: #666;">
+                    <p>Hech qanday natija topilmadi.</p>
+                </div>
             <?php else: ?>
                 <div class="alert alert-info">Hozircha xodimlar ro'yxati bo'sh. <a href="employees">Qo'shish</a></div>
             <?php endif; ?>
         </div>
     </div>
+    
+    <script>
+        // Qidirish funksiyasi
+        const searchInput = document.getElementById('search-input');
+        const positionFilter = document.getElementById('position-filter');
+        const departmentFilter = document.getElementById('department-filter');
+        const searchBtn = document.getElementById('search-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const employeesTbody = document.getElementById('employees-tbody');
+        const filterResults = document.getElementById('filter-results');
+        const noResultsMessage = document.getElementById('no-results-message');
+        
+        function filterEmployees() {
+            if (!employeesTbody) return;
+            
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const positionValue = positionFilter.value;
+            const departmentValue = departmentFilter.value.toLowerCase().trim();
+            
+            const rows = employeesTbody.querySelectorAll('tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name') || '';
+                const position = row.getAttribute('data-position') || '';
+                const department = row.getAttribute('data-department') || '';
+                
+                const matchesSearch = !searchTerm || name.includes(searchTerm);
+                const matchesPosition = !positionValue || position === positionValue;
+                const matchesDepartment = !departmentValue || department.includes(departmentValue);
+                
+                if (matchesSearch && matchesPosition && matchesDepartment) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Natijalar sonini ko'rsatish
+            if (filterResults) {
+                filterResults.textContent = `Topildi: ${visibleCount} ta xodim`;
+            }
+            
+            // Agar natija bo'lmasa, xabar ko'rsatish
+            if (noResultsMessage) {
+                if (visibleCount === 0 && rows.length > 0) {
+                    noResultsMessage.style.display = 'block';
+                } else {
+                    noResultsMessage.style.display = 'none';
+                }
+            }
+        }
+        
+        // Qidirish tugmasi
+        if (searchBtn) {
+            searchBtn.addEventListener('click', filterEmployees);
+        }
+        
+        // Tozalash tugmasi
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                positionFilter.value = '';
+                departmentFilter.value = '';
+                filterEmployees();
+            });
+        }
+        
+        // Enter tugmasi bosilganda qidirish
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterEmployees();
+                }
+            });
+        }
+        
+        // Filter o'zgarganda avtomatik qidirish
+        if (positionFilter) {
+            positionFilter.addEventListener('change', filterEmployees);
+        }
+        
+        if (departmentFilter) {
+            departmentFilter.addEventListener('change', filterEmployees);
+        }
+        
+        // Sahifa yuklanganda barcha natijalarni ko'rsatish
+        window.addEventListener('load', function() {
+            if (filterResults && employeesTbody) {
+                const totalCount = employeesTbody.querySelectorAll('tr').length;
+                filterResults.textContent = `Jami: ${totalCount} ta xodim`;
+            }
+        });
+    </script>
 </body>
 </html>
 
