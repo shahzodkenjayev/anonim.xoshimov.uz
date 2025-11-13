@@ -16,12 +16,13 @@ $message_type = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
     $full_name = sanitize($_POST['full_name'] ?? '');
     $position = sanitize($_POST['position'] ?? '');
-    $department = sanitize($_POST['department'] ?? '');
+    $department_uz = sanitize($_POST['department_uz'] ?? '');
+    $department_ru = sanitize($_POST['department_ru'] ?? '');
     
     if (!empty($full_name) && !empty($position)) {
         try {
-            $stmt = $conn->prepare("INSERT INTO employees (full_name, position, department) VALUES (?, ?, ?)");
-            $stmt->execute([$full_name, $position, $department]);
+            $stmt = $conn->prepare("INSERT INTO employees (full_name, position, department_uz, department_ru) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$full_name, $position, $department_uz, $department_ru]);
             $message = 'Xodim muvaffaqiyatli qo\'shildi!';
             $message_type = 'success';
         } catch (PDOException $e) {
@@ -46,7 +47,7 @@ if (isset($_GET['delete'])) {
 }
 
 // Xodimlar ro'yxati
-$employees_query = "SELECT id, full_name, position, department FROM employees ORDER BY position, full_name";
+$employees_query = "SELECT id, full_name, position, department_uz, department_ru FROM employees ORDER BY position, full_name";
 $employees_result = $conn->query($employees_query);
 $employees = $employees_result->fetchAll();
 ?>
@@ -90,7 +91,10 @@ $employees = $employees_result->fetchAll();
                     </select>
                 </div>
                 <div class="form-group">
-                    <input type="text" name="department" placeholder="Bo'lim (ixtiyoriy)">
+                    <input type="text" name="department_uz" placeholder="Kafedra (UZ)">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="department_ru" placeholder="Kafedra (RU)">
                 </div>
                 <button type="submit" class="btn btn-primary">Qo'shish</button>
             </form>
@@ -115,7 +119,7 @@ $employees = $employees_result->fetchAll();
                                 <td><?php echo $employee['id']; ?></td>
                                 <td><?php echo htmlspecialchars($employee['full_name']); ?></td>
                                 <td><?php echo getPositionName($employee['position']); ?></td>
-                                <td><?php echo htmlspecialchars($employee['department'] ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($employee['department_uz'] ?? '-'); ?></td>
                                 <td>
                                     <a href="employee_results.php?id=<?php echo $employee['id']; ?>" class="btn btn-small">Natijalar</a>
                                     <a href="?delete=<?php echo $employee['id']; ?>" class="btn btn-small btn-danger" onclick="return confirm('Rostdan o\'chirmoqchimisiz?')">O'chirish</a>

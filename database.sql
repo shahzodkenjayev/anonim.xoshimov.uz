@@ -18,7 +18,8 @@ CREATE TABLE employees (
     id INT PRIMARY KEY AUTO_INCREMENT,
     full_name VARCHAR(100) NOT NULL,
     position ENUM('teacher', 'dean', 'coordinator') NOT NULL,
-    department VARCHAR(100),
+    department_uz VARCHAR(100) NULL COMMENT 'Kafedra nomi (Uzbek)',
+    department_ru VARCHAR(100) NULL COMMENT 'Kafedra nomi (Russian)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

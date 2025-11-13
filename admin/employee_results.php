@@ -18,7 +18,7 @@ if ($employee_id <= 0) {
 $conn = getDBConnection();
 
 // Xodim ma'lumotlari
-$employee_stmt = $conn->prepare("SELECT id, full_name, position, department FROM employees WHERE id = ?");
+$employee_stmt = $conn->prepare("SELECT id, full_name, position, department_uz, department_ru FROM employees WHERE id = ?");
 $employee_stmt->execute([$employee_id]);
 $employee = $employee_stmt->fetch();
 
@@ -79,8 +79,11 @@ $stats = $stats_stmt->fetch();
         <div class="employee-info-card">
             <h2><?php echo htmlspecialchars($employee['full_name']); ?></h2>
             <p><strong>Lavozim:</strong> <?php echo getPositionName($employee['position']); ?></p>
-            <?php if ($employee['department']): ?>
-                <p><strong>Bo'lim:</strong> <?php echo htmlspecialchars($employee['department']); ?></p>
+            <?php if ($employee['department_uz']): ?>
+                <p><strong>Kafedra (UZ):</strong> <?php echo htmlspecialchars($employee['department_uz']); ?></p>
+            <?php endif; ?>
+            <?php if ($employee['department_ru']): ?>
+                <p><strong>Kafedra (RU):</strong> <?php echo htmlspecialchars($employee['department_ru']); ?></p>
             <?php endif; ?>
             <div class="stats-inline">
                 <span><strong>Jami javoblar:</strong> <?php echo $stats['total_responses']; ?></span>

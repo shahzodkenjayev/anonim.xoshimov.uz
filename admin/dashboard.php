@@ -11,7 +11,7 @@ if (!isLoggedIn() || !isAdmin()) {
 $conn = getDBConnection();
 
 // Xodimlar ro'yxati
-$employees_query = "SELECT id, full_name, position, department FROM employees ORDER BY position, full_name";
+$employees_query = "SELECT id, full_name, position, department_uz, department_ru FROM employees ORDER BY position, full_name";
 $employees_result = $conn->query($employees_query);
 $employees = $employees_result->fetchAll();
 
@@ -64,6 +64,7 @@ $stats = $stats_result->fetch();
         <div class="admin-section">
             <h2>Xodimlar ro'yxati</h2>
             <a href="employees.php" class="btn btn-primary">Xodimlarni boshqarish</a>
+            <a href="../import_teachers.php" class="btn btn-primary">O'qituvchilarni import qilish</a>
             <a href="add_student.php" class="btn btn-primary">Talabalarni boshqarish</a>
             <a href="results.php" class="btn btn-primary">Natijalarni ko'rish</a>
             <a href="questions.php" class="btn btn-primary">Savollarni boshqarish</a>
@@ -88,7 +89,7 @@ $stats = $stats_result->fetch();
                                 <td><?php echo $employee['id']; ?></td>
                                 <td><?php echo htmlspecialchars($employee['full_name']); ?></td>
                                 <td><?php echo getPositionName($employee['position']); ?></td>
-                                <td><?php echo htmlspecialchars($employee['department'] ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($employee['department_uz'] ?? '-'); ?></td>
                                 <td>
                                     <a href="employee_results.php?id=<?php echo $employee['id']; ?>" class="btn btn-small">Natijalar</a>
                                 </td>

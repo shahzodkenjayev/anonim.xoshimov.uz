@@ -26,6 +26,12 @@ Thumbs.db
 # Test files
 test_connection.php
 
+# Excel and CSV files (shaxsiy ma'lumotlar)
+*.xlsx
+*.xls
+*.csv
+teachers.*
+
 # Temporary files
 *.bak
 *.backup

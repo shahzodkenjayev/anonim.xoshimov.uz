@@ -14,7 +14,7 @@ $message = '';
 $message_type = '';
 
 // Xodimlar ro'yxatini olish
-$employees_query = "SELECT id, full_name, position, department FROM employees ORDER BY position, full_name";
+$employees_query = "SELECT id, full_name, position, department_uz, department_ru FROM employees ORDER BY position, full_name";
 $employees_result = $conn->query($employees_query);
 $employees = $employees_result->fetchAll();
 
@@ -116,8 +116,8 @@ $submitted_employees = $submitted_result;
                         <div class="employee-header">
                             <h3><?php echo htmlspecialchars($employee['full_name']); ?></h3>
                             <span class="position-badge"><?php echo getPositionName($employee['position']); ?></span>
-                            <?php if ($employee['department']): ?>
-                                <span class="department"><?php echo htmlspecialchars($employee['department']); ?></span>
+                            <?php if ($employee['department_uz']): ?>
+                                <span class="department"><?php echo htmlspecialchars($employee['department_uz']); ?></span>
                             <?php endif; ?>
                             <?php if ($is_submitted): ?>
                                 <span class="submitted-badge">✓ Topshirilgan</span>

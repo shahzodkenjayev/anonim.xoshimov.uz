@@ -15,7 +15,7 @@ $results_query = "SELECT
     e.id,
     e.full_name,
     e.position,
-    e.department,
+    e.department_uz,
     COUNT(DISTINCT ss.user_id) as total_responses,
     AVG(sr.rating) as avg_rating
     FROM employees e
@@ -66,7 +66,7 @@ $results = $results_result->fetchAll();
                             <tr>
                                 <td><?php echo htmlspecialchars($row['full_name']); ?></td>
                                 <td><?php echo getPositionName($row['position']); ?></td>
-                                <td><?php echo htmlspecialchars($row['department'] ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($row['department_uz'] ?? '-'); ?></td>
                                 <td><?php echo $row['total_responses']; ?></td>
                                 <td>
                                     <?php if ($row['avg_rating']): ?>
