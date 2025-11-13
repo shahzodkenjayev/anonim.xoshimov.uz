@@ -28,10 +28,27 @@ $query_params = [];
 if (isset($url_parts['query'])) {
     parse_str($url_parts['query'], $query_params);
 }
-$query_params['lang'] = 'uz'; // Default
-$url_uz = $url_parts['path'] . '?' . http_build_query($query_params);
-$query_params['lang'] = 'ru';
-$url_ru = $url_parts['path'] . '?' . http_build_query($query_params);
+
+// Lang parametrini olib tashlash (keyin qo'shamiz)
+unset($query_params['lang']);
+
+// Joriy sahifa nomini olish
+$current_script = basename($_SERVER['PHP_SELF'], '.php');
+if (empty($current_script) || $current_script === 'index') {
+    $current_script = 'dashboard';
+}
+
+// URL yaratish
+$base_path = $current_script;
+if (!empty($query_params)) {
+    $query_params['lang'] = 'uz';
+    $url_uz = $base_path . '?' . http_build_query($query_params);
+    $query_params['lang'] = 'ru';
+    $url_ru = $base_path . '?' . http_build_query($query_params);
+} else {
+    $url_uz = $base_path . '?lang=uz';
+    $url_ru = $base_path . '?lang=ru';
+}
 ?>
 <aside class="admin-sidebar">
     <div class="sidebar-header">
@@ -40,44 +57,44 @@ $url_ru = $url_parts['path'] . '?' . http_build_query($query_params);
     <nav class="sidebar-nav">
         <ul>
             <li>
-                <a href="dashboard" class="nav-link <?php echo ($current_page === 'dashboard') ? 'active' : ''; ?>">
+                <a href="dashboard?lang=<?php echo $current_lang; ?>" class="nav-link <?php echo ($current_page === 'dashboard') ? 'active' : ''; ?>">
                     <span class="nav-icon">📊</span>
                     <span class="nav-text">Boshqaruv</span>
                 </a>
             </li>
             <li>
-                <a href="employees" class="nav-link <?php echo ($current_page === 'employees') ? 'active' : ''; ?>">
+                <a href="employees?lang=<?php echo $current_lang; ?>" class="nav-link <?php echo ($current_page === 'employees') ? 'active' : ''; ?>">
                     <span class="nav-icon">👥</span>
                     <span class="nav-text">Xodimlar</span>
                 </a>
             </li>
             <li>
-                <a href="add_student" class="nav-link <?php echo ($current_page === 'add_student') ? 'active' : ''; ?>">
+                <a href="add_student?lang=<?php echo $current_lang; ?>" class="nav-link <?php echo ($current_page === 'add_student') ? 'active' : ''; ?>">
                     <span class="nav-icon">🎓</span>
                     <span class="nav-text">Talabalar</span>
                 </a>
             </li>
             <li>
-                <a href="results" class="nav-link <?php echo ($current_page === 'results') ? 'active' : ''; ?>">
+                <a href="results?lang=<?php echo $current_lang; ?>" class="nav-link <?php echo ($current_page === 'results') ? 'active' : ''; ?>">
                     <span class="nav-icon">📈</span>
                     <span class="nav-text">Natijalar</span>
                 </a>
             </li>
             <li>
-                <a href="questions" class="nav-link <?php echo ($current_page === 'questions') ? 'active' : ''; ?>">
+                <a href="questions?lang=<?php echo $current_lang; ?>" class="nav-link <?php echo ($current_page === 'questions') ? 'active' : ''; ?>">
                     <span class="nav-icon">❓</span>
                     <span class="nav-text">Savollar</span>
                 </a>
             </li>
             <li>
-                <a href="create_admin" class="nav-link <?php echo ($current_page === 'create_admin') ? 'active' : ''; ?>">
+                <a href="create_admin?lang=<?php echo $current_lang; ?>" class="nav-link <?php echo ($current_page === 'create_admin') ? 'active' : ''; ?>">
                     <span class="nav-icon">👤</span>
                     <span class="nav-text">Admin qo'shish</span>
                 </a>
             </li>
             <li class="sidebar-divider"></li>
             <li>
-                <a href="settings" class="nav-link <?php echo ($current_page === 'settings') ? 'active' : ''; ?>">
+                <a href="settings?lang=<?php echo $current_lang; ?>" class="nav-link <?php echo ($current_page === 'settings') ? 'active' : ''; ?>">
                     <span class="nav-icon">⚙️</span>
                     <span class="nav-text">Sozlamalar</span>
                 </a>

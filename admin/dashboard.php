@@ -9,6 +9,12 @@ if (!isLoggedIn() || !isAdmin()) {
     exit;
 }
 
+// Tilni o'rnatish (GET parametri orqali)
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['uz', 'ru'])) {
+    setUserLanguage($_GET['lang']);
+}
+$current_lang = getUserLanguage();
+
 $conn = getDBConnection();
 
 // Xodimlar ro'yxati
