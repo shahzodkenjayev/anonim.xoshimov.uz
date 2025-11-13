@@ -1,6 +1,7 @@
 <?php
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/base_path.php';
 
 // Login tekshirish
 if (!isLoggedIn() || isAdmin()) {
@@ -96,6 +97,14 @@ $submitted_employees = $submitted_result;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>So'rovnoma - Talaba</title>
+    <meta name="description" content="O'qituvchilar, dekanlar va koordinatorlarni baholash. Fikringizni bildiring.">
+    <?php 
+    $pageTitle = $current_lang === 'ru' ? 'Опрос - Студент' : 'So\'rovnoma - Talaba';
+    $pageDescription = $current_lang === 'ru' 
+        ? 'Оцените преподавателей, деканов и координаторов. Выразите свое мнение.'
+        : 'O\'qituvchilar, dekanlar va koordinatorlarni baholang. Fikringizni bildiring.';
+    echo generateMetaTags($pageTitle, $pageDescription);
+    ?>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>

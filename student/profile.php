@@ -1,6 +1,7 @@
 <?php
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/base_path.php';
 
 // Login tekshirish
 if (!isLoggedIn() || isAdmin()) {
@@ -88,6 +89,14 @@ $current_lang = getUserLanguage();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil - <?php echo htmlspecialchars($user['full_name']); ?></title>
+    <meta name="description" content="Foydalanuvchi profili va parol o'zgartirish">
+    <?php 
+    $pageTitle = $current_lang === 'ru' ? 'Профиль - ' . htmlspecialchars($user['full_name']) : 'Profil - ' . htmlspecialchars($user['full_name']);
+    $pageDescription = $current_lang === 'ru' 
+        ? 'Профиль пользователя. Измените пароль и просмотрите информацию.'
+        : 'Foydalanuvchi profili. Parolni o\'zgartiring va ma\'lumotlarni ko\'ring.';
+    echo generateMetaTags($pageTitle, $pageDescription);
+    ?>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         .profile-container {

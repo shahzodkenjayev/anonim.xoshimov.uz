@@ -1,6 +1,7 @@
 <?php
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/base_path.php';
 
 // Tilni o'rnatish (GET parametri orqali)
 if (isset($_GET['lang']) && in_array($_GET['lang'], ['uz', 'ru'])) {
@@ -86,6 +87,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $current_lang === 'ru' ? 'Студент - Вход в систему' : 'Talaba - Tizimga Kirish'; ?></title>
+    <meta name="description" content="<?php echo $current_lang === 'ru' ? 'Вход в систему для студентов. Оцените преподавателей, деканов и координаторов.' : 'Talabalar uchun tizimga kirish. O\'qituvchilar, dekanlar va koordinatorlarni baholang.'; ?>">
+    <?php 
+    $pageTitle = $current_lang === 'ru' ? 'Студент - Вход в систему' : 'Talaba - Tizimga Kirish';
+    $pageDescription = $current_lang === 'ru' 
+        ? 'Вход в систему для студентов. Оцените преподавателей, деканов и координаторов анонимно.'
+        : 'Talabalar uchun tizimga kirish. O\'qituvchilar, dekanlar va koordinatorlarni anonim baholang.';
+    echo generateMetaTags($pageTitle, $pageDescription);
+    ?>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>

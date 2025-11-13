@@ -1,6 +1,7 @@
 <?php
 require_once 'config/database.php';
 require_once 'includes/functions.php';
+require_once 'includes/base_path.php';
 
 // Tilni o'rnatish (GET parametri orqali)
 if (isset($_GET['lang']) && in_array($_GET['lang'], ['uz', 'ru'])) {
@@ -24,6 +25,14 @@ if (isLoggedIn()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo t('site_title'); ?></title>
+    <meta name="description" content="<?php echo $current_lang === 'ru' ? 'Анонимная система опроса для оценки преподавателей, деканов и координаторов' : 'O\'qituvchilar, dekanlar va koordinatorlarni baholash uchun anonim so\'rovnoma tizimi'; ?>">
+    <?php 
+    $pageTitle = $current_lang === 'ru' ? 'Анонимная система опроса' : 'Anonim So\'rovnoma';
+    $pageDescription = $current_lang === 'ru' 
+        ? 'Анонимная система опроса для оценки преподавателей, деканов и координаторов. Выразите свое мнение безопасно и конфиденциально.'
+        : 'O\'qituvchilar, dekanlar va koordinatorlarni baholash uchun anonim so\'rovnoma tizimi. Fikringizni xavfsiz va maxfiy bildiring.';
+    echo generateMetaTags($pageTitle, $pageDescription);
+    ?>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>

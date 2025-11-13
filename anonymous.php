@@ -2,6 +2,7 @@
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 require_once 'includes/security.php';
+require_once 'includes/base_path.php';
 
 // Xavfsizlik sozlamalari
 secureSession();
@@ -162,6 +163,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anonim Ovoz Berish</title>
+    <meta name="description" content="O'qituvchilar, dekanlar va koordinatorlarni anonim baholash. Fikringizni xavfsiz va maxfiy bildiring.">
+    <?php 
+    $pageTitle = $current_lang === 'ru' ? 'Анонимное голосование' : 'Anonim Ovoz Berish';
+    $pageDescription = $current_lang === 'ru' 
+        ? 'Анонимная оценка преподавателей, деканов и координаторов. Выразите свое мнение безопасно и конфиденциально.'
+        : 'O\'qituvchilar, dekanlar va koordinatorlarni anonim baholash. Fikringizni xavfsiz va maxfiy bildiring.';
+    echo generateMetaTags($pageTitle, $pageDescription);
+    ?>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>

@@ -69,5 +69,46 @@ function image($file) {
     }
     return asset('assets/images/' . $file);
 }
+
+// Open Graph meta teglarini yaratish
+function generateMetaTags($title, $description, $image = null, $type = 'website', $url = null) {
+    $baseUrl = getBaseUrl();
+    
+    // Agar URL berilmagan bo'lsa, joriy URL ni olish
+    if ($url === null) {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+        $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    }
+    
+    // Agar image berilmagan bo'lsa, default image
+    if ($image === null) {
+        $image = $baseUrl . '/assets/images/og-image.png'; // Default image
+    } else {
+        // Agar image relative path bo'lsa, absolute qilamiz
+        if (strpos($image, 'http') !== 0) {
+            $image = $baseUrl . '/' . ltrim($image, '/');
+        }
+    }
+    
+    $siteName = 'Anonim So\'rovnoma';
+    $locale = getUserLanguage() === 'ru' ? 'ru_RU' : 'uz_UZ';
+    
+    $meta = '';
+    $meta .= '<meta property="og:title" content="' . htmlspecialchars($title) . '">' . "\n";
+    $meta .= '<meta property="og:description" content="' . htmlspecialchars($description) . '">' . "\n";
+    $meta .= '<meta property="og:image" content="' . htmlspecialchars($image) . '">' . "\n";
+    $meta .= '<meta property="og:url" content="' . htmlspecialchars($url) . '">' . "\n";
+    $meta .= '<meta property="og:type" content="' . htmlspecialchars($type) . '">' . "\n";
+    $meta .= '<meta property="og:site_name" content="' . htmlspecialchars($siteName) . '">' . "\n";
+    $meta .= '<meta property="og:locale" content="' . htmlspecialchars($locale) . '">' . "\n";
+    
+    // Twitter Card
+    $meta .= '<meta name="twitter:card" content="summary_large_image">' . "\n";
+    $meta .= '<meta name="twitter:title" content="' . htmlspecialchars($title) . '">' . "\n";
+    $meta .= '<meta name="twitter:description" content="' . htmlspecialchars($description) . '">' . "\n";
+    $meta .= '<meta name="twitter:image" content="' . htmlspecialchars($image) . '">' . "\n";
+    
+    return $meta;
+}
 ?>
 
