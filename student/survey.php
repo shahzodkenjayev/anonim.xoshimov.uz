@@ -103,7 +103,9 @@ $submitted_employees = $submitted_result;
         <div class="container">
             <h1>Anonim So'rovnoma</h1>
             <div class="user-info">
-                <span><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
+                <a href="profile" style="text-decoration: none; color: inherit; cursor: pointer; margin-right: 15px;">
+                    <span style="font-weight: 500;"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
+                </a>
                 <a href="../logout" class="btn btn-secondary">Chiqish</a>
             </div>
         </div>
