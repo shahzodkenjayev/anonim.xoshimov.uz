@@ -614,7 +614,8 @@ body {
   border-radius: 12px;
   padding: 25px;
   margin-bottom: 30px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8e8e8;
 }
 
 .filter-row {
@@ -632,26 +633,47 @@ body {
 
 .filter-group label {
   display: block;
-  margin-bottom: 8px;
-  color: #333;
-  font-weight: 500;
-  font-size: 14px;
+  margin-bottom: 10px;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
-.filter-group input[type="text"],
-.filter-group select {
+.filter-group input[type="text"] {
   width: 100%;
-  padding: 10px 15px;
+  padding: 12px 15px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   transition: border-color 0.3s;
+  background: white;
+}
+
+.filter-group select {
+  width: 100%;
+  padding: 12px 15px;
+  padding-right: 35px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+  background: white;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  cursor: pointer;
 }
 
 .filter-group input[type="text"]:focus,
 .filter-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
 
 .filter-group button {
@@ -673,12 +695,88 @@ body {
 }
 
 @media (max-width: 768px) {
+  .filter-panel {
+    padding: 15px;
+    border-radius: 8px;
+  }
+
   .filter-row {
     flex-direction: column;
+    gap: 15px;
   }
 
   .filter-group {
     min-width: 100%;
+    flex: none;
+  }
+
+  .filter-group label {
+    font-size: 15px;
+    margin-bottom: 10px;
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .filter-group input[type="text"] {
+    font-size: 16px;
+    padding: 14px 15px;
+    border: 2px solid #d0d0d0;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .filter-group select {
+    font-size: 16px;
+    padding: 14px 15px;
+    padding-right: 40px;
+    border: 2px solid #d0d0d0;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    background-size: 14px;
+    background-position: right 15px center;
+    cursor: pointer;
+  }
+
+  .filter-group button {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  .filter-results {
+    padding-top: 15px;
+    font-size: 15px;
+    text-align: center;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  .survey-section {
+    padding: 20px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-panel {
+    padding: 12px;
+  }
+
+  .filter-group label {
+    font-size: 14px;
+  }
+
+  .filter-group input[type="text"],
+  .filter-group select {
+    font-size: 16px;
+    padding: 12px 15px;
+    padding-right: 40px;
   }
 }
 
