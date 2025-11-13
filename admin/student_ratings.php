@@ -35,22 +35,38 @@ $ratings_query = "SELECT
     e.position,
     e.department_uz,
     e.department_ru,
-    ss.submitted_at,
-    GROUP_CONCAT(
-        CONCAT(q.id, ':', COALESCE(sr.rating, ''), ':', COALESCE(sr.text_response, ''))
-        SEPARATOR '|||'
-    ) as responses
+    ss.submitted_at
     FROM survey_submissions ss
     INNER JOIN employees e ON ss.employee_id = e.id
-    LEFT JOIN survey_responses sr ON ss.employee_id = sr.employee_id AND ss.user_id = ?
-    LEFT JOIN questions q ON sr.question_id = q.id
     WHERE ss.user_id = ?
-    GROUP BY e.id, ss.submitted_at
     ORDER BY ss.submitted_at DESC";
 
 $ratings_stmt = $conn->prepare($ratings_query);
-$ratings_stmt->execute([$student_id, $student_id]);
+$ratings_stmt->execute([$student_id]);
 $ratings = $ratings_stmt->fetchAll();
+
+// Har bir xodim uchun batafsil javoblarni olish
+foreach ($ratings as &$rating) {
+    $responses_query = "SELECT 
+        q.id as question_id,
+        q.question_text_uz,
+        q.question_text_ru,
+        q.question_type,
+        sr.rating,
+        sr.text_response
+        FROM survey_responses sr
+        INNER JOIN questions q ON sr.question_id = q.id
+        WHERE sr.employee_id = ? AND EXISTS (
+            SELECT 1 FROM survey_submissions ss 
+            WHERE ss.user_id = ? AND ss.employee_id = sr.employee_id
+        )
+        ORDER BY q.id";
+    
+    $responses_stmt = $conn->prepare($responses_query);
+    $responses_stmt->execute([$rating['employee_id'], $student_id]);
+    $rating['responses'] = $responses_stmt->fetchAll();
+}
+unset($rating);
 
 // Barcha savollarni olish (baho ko'rsatish uchun)
 $questions_query = "SELECT id, question_text_uz, question_text_ru, question_type FROM questions ORDER BY id";
@@ -157,43 +173,18 @@ $stats = $stats_stmt->fetch();
                             <p><strong>Baholangan sana:</strong> <?php echo date('d.m.Y H:i', strtotime($rating['submitted_at'])); ?></p>
                             
                             <!-- Batafsil javoblar -->
-                            <?php if ($rating['responses']): ?>
+                            <?php if (!empty($rating['responses'])): ?>
                                 <div class="text-responses" style="margin-top: 15px;">
-                                    <?php
-                                    $responses = explode('|||', $rating['responses']);
-                                    $employee_responses = [];
-                                    foreach ($responses as $response) {
-                                        if (empty($response)) continue;
-                                        $parts = explode(':', $response, 3);
-                                        if (count($parts) >= 2) {
-                                            $q_id = $parts[0];
-                                            $rating_val = $parts[1] ?? '';
-                                            $text_val = $parts[2] ?? '';
-                                            if (!isset($employee_responses[$q_id])) {
-                                                $employee_responses[$q_id] = ['rating' => '', 'text' => ''];
-                                            }
-                                            if ($rating_val) {
-                                                $employee_responses[$q_id]['rating'] = $rating_val;
-                                            }
-                                            if ($text_val) {
-                                                $employee_responses[$q_id]['text'] = $text_val;
-                                            }
-                                        }
-                                    }
-                                    
-                                    foreach ($employee_responses as $q_id => $response_data):
-                                        if (!isset($questions_map[$q_id])) continue;
-                                        $question = $questions_map[$q_id];
-                                    ?>
-                                        <div class="text-response-item" style="margin-bottom: 15px;">
-                                            <p><strong><?php echo htmlspecialchars($question['question_text_uz']); ?>:</strong></p>
-                                            <?php if ($question['question_type'] === 'rating' && $response_data['rating']): ?>
+                                    <?php foreach ($rating['responses'] as $response): ?>
+                                        <div class="text-response-item" style="margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; border-left: 3px solid #4a90e2;">
+                                            <p><strong><?php echo htmlspecialchars($response['question_text_uz']); ?>:</strong></p>
+                                            <?php if ($response['question_type'] === 'rating' && $response['rating']): ?>
                                                 <p>
-                                                    <span class="stars-small"><?php echo renderStars(intval($response_data['rating'])); ?></span>
-                                                    <strong><?php echo $response_data['rating']; ?>/5</strong>
+                                                    <span class="stars-small"><?php echo renderStars(intval($response['rating'])); ?></span>
+                                                    <strong style="color: #4a90e2; margin-left: 10px;"><?php echo $response['rating']; ?>/5</strong>
                                                 </p>
-                                            <?php elseif ($question['question_type'] === 'text' && $response_data['text']): ?>
-                                                <p><?php echo htmlspecialchars($response_data['text']); ?></p>
+                                            <?php elseif ($response['question_type'] === 'text' && $response['text_response']): ?>
+                                                <p style="color: #333; margin-top: 5px;"><?php echo nl2br(htmlspecialchars($response['text_response'])); ?></p>
                                             <?php endif; ?>
                                         </div>
                                     <?php endforeach; ?>
