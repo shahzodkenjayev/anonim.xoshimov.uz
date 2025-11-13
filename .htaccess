@@ -85,3 +85,23 @@ AddDefaultCharset UTF-8
     AddType text/css css
 </IfModule>
 
+# Cache Control - HTML va PHP fayllar uchun cache'ni o'chirish
+<IfModule mod_headers.c>
+    # HTML va PHP fayllar uchun cache'ni o'chirish (meta teglar yangilanishi uchun)
+    <FilesMatch "\.(html|htm|php)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+    
+    # CSS va JS fayllar uchun cache (ixtiyoriy - tez yuklanish uchun)
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=3600"
+    </FilesMatch>
+    
+    # Rasmlar uchun cache
+    <FilesMatch "\.(jpg|jpeg|png|gif|svg|webp)$">
+        Header set Cache-Control "public, max-age=86400"
+    </FilesMatch>
+</IfModule>
+
