@@ -1,6 +1,23 @@
 <?php
 require_once 'config/database.php';
 require_once 'includes/functions.php';
+require_once 'includes/security.php';
+
+// Xavfsizlik sozlamalari
+secureSession();
+validateRequestMethod(['GET', 'POST']);
+
+// IP bloklash tekshiruvi
+if (isIPBlocked()) {
+    logSecurityEvent('blocked_ip_attempt', ['ip' => getClientIP()]);
+    http_response_code(403);
+    die('Access Denied');
+}
+
+// Shubhali faoliyatni aniqlash
+if (detectSuspiciousActivity()) {
+    logSecurityEvent('suspicious_activity_detected', ['ip' => getClientIP()]);
+}
 
 $conn = getDBConnection();
 $message = '';
@@ -33,19 +50,55 @@ if (!isset($_SESSION[$session_key])) {
     $_SESSION[$session_key] = [];
 }
 
+// CAPTCHA'lar har bir forma uchun alohida yaratiladi (form ichida)
+
 // Forma yuborilganda
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $employee_id = intval($_POST['employee_id'] ?? 0);
-    
-    if ($employee_id > 0) {
-        // Bu browser'dan bu xodimga allaqachon ovoz berilganmi?
-        if (in_array($employee_id, $_SESSION[$session_key])) {
-            $message = t('already_voted');
+    // Rate limiting tekshiruvi
+    if (!checkRateLimit('anonymous_vote', 5, 60)) {
+        $message = 'Juda ko\'p so\'rov yuborildi. Iltimos, bir daqiqadan keyin qayta urinib ko\'ring.';
+        $message_type = 'error';
+        logSecurityEvent('rate_limit_exceeded', ['ip' => getClientIP()]);
+    }
+    // CSRF token tekshiruvi
+    else if (!isset($_POST['csrf_token']) || !verifyCSRFToken($_POST['csrf_token'])) {
+        $message = 'Xavfsizlik xatosi. Sahifani yangilab qayta urinib ko\'ring.';
+        $message_type = 'error';
+        logSecurityEvent('csrf_token_invalid', ['ip' => getClientIP()]);
+    }
+    // CAPTCHA tekshiruvi
+    else if (!isset($_POST['captcha_answer']) || !isset($_POST['captcha_key'])) {
+        $message = 'CAPTCHA javobini kiriting.';
+        $message_type = 'error';
+        logSecurityEvent('captcha_missing', ['ip' => getClientIP()]);
+    }
+    else {
+        // CAPTCHA key'dan form ID ni olish
+        $captchaKey = sanitize($_POST['captcha_key']);
+        $formId = str_replace('captcha_', '', $captchaKey);
+        
+        if (!verifyCaptcha($_POST['captcha_answer'], $formId)) {
+            $message = 'CAPTCHA noto\'g\'ri. Qayta urinib ko\'ring.';
             $message_type = 'error';
+            logSecurityEvent('captcha_failed', ['ip' => getClientIP()]);
         } else {
-            // Javoblarni saqlash (anonim, user_id = NULL)
-            $conn->beginTransaction();
-            try {
+            $employee_id = intval($_POST['employee_id'] ?? 0);
+            
+            // Employee ID validation
+            if ($employee_id <= 0 || !validateInput($employee_id, 'int')) {
+                $message = 'Noto\'g\'ri xodim ID.';
+                $message_type = 'error';
+                logSecurityEvent('invalid_employee_id', ['ip' => getClientIP(), 'employee_id' => $_POST['employee_id'] ?? '']);
+            }
+            // Bu browser'dan bu xodimga allaqachon ovoz berilganmi?
+            else if (in_array($employee_id, $_SESSION[$session_key])) {
+                $message = t('already_voted');
+                $message_type = 'error';
+            } else {
+                // Javoblarni saqlash (anonim, user_id = NULL)
+                $conn->beginTransaction();
+                try {
+                $validResponses = 0;
                 foreach ($questions as $question) {
                     $question_id = $question['id'];
                     $rating = null;
@@ -54,25 +107,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($question['question_type'] === 'rating') {
                         $rating = intval($_POST['question_' . $question_id] ?? 0);
                         if ($rating < 1 || $rating > 5) continue;
+                        if (!validateInput($rating, 'int')) continue;
                     } else {
                         $text_response = sanitize($_POST['question_' . $question_id] ?? '');
+                        if (!validateInput($text_response, 'text', 2000)) {
+                            logSecurityEvent('invalid_text_response', [
+                                'ip' => getClientIP(),
+                                'length' => strlen($text_response)
+                            ]);
+                            continue;
+                        }
                     }
                     
                     // Anonim javob - user_id NULL
                     $insert_stmt = $conn->prepare("INSERT INTO survey_responses (employee_id, question_id, rating, text_response) VALUES (?, ?, ?, ?)");
                     $insert_stmt->execute([$employee_id, $question_id, $rating, $text_response]);
+                    $validResponses++;
                 }
                 
-                // Session'da saqlash (bir marta ovoz berishni ta'minlash uchun)
-                $_SESSION[$session_key][] = $employee_id;
-                
-                $conn->commit();
-                $message = t('vote_success');
-                $message_type = 'success';
-            } catch (Exception $e) {
-                $conn->rollBack();
-                $message = 'Xatolik yuz berdi: ' . $e->getMessage();
-                $message_type = 'error';
+                if ($validResponses > 0) {
+                    // Session'da saqlash (bir marta ovoz berishni ta'minlash uchun)
+                    $_SESSION[$session_key][] = $employee_id;
+                    
+                    $conn->commit();
+                    $message = t('vote_success');
+                    $message_type = 'success';
+                    logSecurityEvent('vote_submitted', [
+                        'ip' => getClientIP(),
+                        'employee_id' => $employee_id,
+                        'responses_count' => $validResponses
+                    ]);
+                } else {
+                    $conn->rollBack();
+                    $message = 'Hech qanday to\'g\'ri javob topilmadi.';
+                    $message_type = 'error';
+                }
+                } catch (Exception $e) {
+                    $conn->rollBack();
+                    $message = 'Xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.';
+                    $message_type = 'error';
+                    logSecurityEvent('database_error', [
+                        'ip' => getClientIP(),
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
         }
     }
@@ -182,6 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php if (!$is_voted): ?>
                             <form method="POST" class="survey-form">
                                 <input type="hidden" name="employee_id" value="<?php echo $employee['id']; ?>">
+                                <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                                 
                                 <?php foreach ($questions as $question): ?>
                                     <?php 
@@ -205,10 +284,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <?php endfor; ?>
                                             </div>
                                         <?php else: ?>
-                                            <textarea name="question_<?php echo $question['id']; ?>" rows="3" class="form-control" placeholder="Javobingizni yozing..."></textarea>
+                                            <textarea name="question_<?php echo $question['id']; ?>" rows="3" class="form-control" placeholder="Javobingizni yozing..." maxlength="2000"></textarea>
                                         <?php endif; ?>
                                     </div>
                                 <?php endforeach; ?>
+                                
+                                <!-- CAPTCHA -->
+                                <?php 
+                                // Har bir forma uchun alohida CAPTCHA
+                                $form_captcha = generateSimpleCaptcha($employee['id']);
+                                ?>
+                                <div class="captcha-group" style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+                                    <input type="hidden" name="captcha_key" value="<?php echo htmlspecialchars($form_captcha['key']); ?>">
+                                    <label for="captcha_<?php echo $employee['id']; ?>" style="display: block; margin-bottom: 10px; font-weight: bold;">
+                                        Xavfsizlik tekshiruvi: <?php echo htmlspecialchars($form_captcha['question']); ?> = ?
+                                    </label>
+                                    <input type="number" 
+                                           id="captcha_<?php echo $employee['id']; ?>" 
+                                           name="captcha_answer" 
+                                           class="form-control" 
+                                           placeholder="Javobni kiriting" 
+                                           required 
+                                           style="max-width: 200px; display: inline-block;">
+                                    <small style="display: block; margin-top: 5px; color: #666;">
+                                        Botlardan himoya qilish uchun matematik masalani yeching
+                                    </small>
+                                </div>
                                 
                                 <button type="submit" class="btn btn-primary"><?php echo t('vote_submit'); ?></button>
                             </form>
