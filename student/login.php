@@ -108,7 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="login-info">
                 <p><strong>Eslatma:</strong></p>
-                <p>HEMIS ID bilan kirish uchun talabalar ma'lumotlari avval import qilinishi kerak.</p>
                 <p>Default parol: <strong>12345678</strong></p>
             </div>
             
