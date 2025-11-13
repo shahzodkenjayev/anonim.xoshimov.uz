@@ -2,6 +2,12 @@
 // Sidebar fayli - barcha admin sahifalarida ishlatiladi
 // Eslatma: Bu fayl include qilinganda, admin tekshiruvi allaqachon o'tgan bo'lishi kerak
 
+// Tilni o'rnatish (GET parametri orqali)
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['uz', 'ru'])) {
+    setUserLanguage($_GET['lang']);
+}
+$current_lang = getUserLanguage();
+
 // Joriy sahifani aniqlash (active link uchun)
 $current_page = basename($_SERVER['PHP_SELF'], '.php');
 if (empty($current_page) || $current_page === 'index') {
@@ -14,6 +20,18 @@ if ($current_page === 'employee_results') {
 } elseif ($current_page === 'student_ratings') {
     $current_page = 'add_student';
 }
+
+// Joriy URL ni olish (til parametrini qo'shish uchun)
+$current_url = $_SERVER['REQUEST_URI'];
+$url_parts = parse_url($current_url);
+$query_params = [];
+if (isset($url_parts['query'])) {
+    parse_str($url_parts['query'], $query_params);
+}
+$query_params['lang'] = 'uz'; // Default
+$url_uz = $url_parts['path'] . '?' . http_build_query($query_params);
+$query_params['lang'] = 'ru';
+$url_ru = $url_parts['path'] . '?' . http_build_query($query_params);
 ?>
 <aside class="admin-sidebar">
     <div class="sidebar-header">
@@ -73,12 +91,20 @@ if ($current_page === 'employee_results') {
         </ul>
     </nav>
     <div class="sidebar-footer">
+        <!-- Til tanlash -->
+        <div class="sidebar-lang-switcher">
+            <a href="<?php echo htmlspecialchars($url_uz); ?>" class="lang-option-sidebar <?php echo $current_lang === 'uz' ? 'active' : ''; ?>">
+                <span class="flag-icon-small"><?php echo getFlagSvg('uz'); ?></span>
+                <span>O'zbek</span>
+            </a>
+            <a href="<?php echo htmlspecialchars($url_ru); ?>" class="lang-option-sidebar <?php echo $current_lang === 'ru' ? 'active' : ''; ?>">
+                <span class="flag-icon-small"><?php echo getFlagSvg('ru'); ?></span>
+                <span>Русский</span>
+            </a>
+        </div>
+        <!-- Foydalanuvchi ma'lumotlari -->
         <div class="user-info-sidebar">
-            <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['full_name'], 0, 1)); ?></div>
-            <div class="user-details">
-                <span class="user-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-                <span class="user-username">@<?php echo htmlspecialchars($_SESSION['username']); ?></span>
-            </div>
+            <span class="user-username-only">@<?php echo htmlspecialchars($_SESSION['username']); ?></span>
         </div>
     </div>
 </aside>
