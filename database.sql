@@ -7,10 +7,14 @@ USE anonim_survey;
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) UNIQUE NOT NULL,
+    hemis_id VARCHAR(50) NULL UNIQUE COMMENT 'HEMIS ID (student_id_number)',
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
+    faculty VARCHAR(200) NULL COMMENT 'Fakultet nomi',
+    group_name VARCHAR(100) NULL COMMENT 'Guruh nomi',
     role ENUM('admin', 'student') DEFAULT 'student',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_hemis_id (hemis_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Xodimlar jadvali (O'qituvchilar, Dekanlar, Koordinatorlar)

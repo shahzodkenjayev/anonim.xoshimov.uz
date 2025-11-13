@@ -15,30 +15,59 @@ if (isLoggedIn()) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = sanitize($_POST['username'] ?? '');
+    $hemis_id = sanitize($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     
-    if (!empty($username) && !empty($password)) {
+    if (!empty($hemis_id) && !empty($password)) {
         $conn = getDBConnection();
-        $stmt = $conn->prepare("SELECT id, username, password, full_name, role FROM users WHERE username = ?");
-        $stmt->execute([$username]);
+        
+        // HEMIS ID yoki username bo'yicha qidirish
+        $stmt = $conn->prepare("SELECT id, username, hemis_id, password, full_name, faculty, group_name, role FROM users WHERE hemis_id = ? OR username = ?");
+        $stmt->execute([$hemis_id, $hemis_id]);
         $user = $stmt->fetch();
         
-        if ($user && password_verify($password, $user['password'])) {
-            // Faqat talabalar kirishi mumkin
-            if ($user['role'] === 'admin') {
-                $error = 'Adminlar uchun alohida login sahifasi mavjud. <a href="../admin/login.php">Admin login</a>';
+        if ($user) {
+            // Default parol tekshiruvi (12345678)
+            $default_password = '12345678';
+            $password_valid = false;
+            
+            if ($password === $default_password) {
+                // Default parol bilan tekshirish
+                if (password_verify($default_password, $user['password'])) {
+                    $password_valid = true;
+                } else {
+                    // Agar parol hash noto'g'ri bo'lsa, yangilash
+                    $new_hash = password_hash($default_password, PASSWORD_DEFAULT);
+                    $update_stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+                    $update_stmt->execute([$new_hash, $user['id']]);
+                    $password_valid = true;
+                }
             } else {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['full_name'] = $user['full_name'];
-                $_SESSION['role'] = $user['role'];
-                
-                header('Location: survey.php');
-                exit;
+                // Oddiy parol tekshiruvi
+                $password_valid = password_verify($password, $user['password']);
+            }
+            
+            if ($password_valid) {
+                // Faqat talabalar kirishi mumkin
+                if ($user['role'] === 'admin') {
+                    $error = 'Adminlar uchun alohida login sahifasi mavjud. <a href="../admin/login.php">Admin login</a>';
+                } else {
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'] ?? $user['hemis_id'];
+                    $_SESSION['hemis_id'] = $user['hemis_id'];
+                    $_SESSION['full_name'] = $user['full_name'];
+                    $_SESSION['faculty'] = $user['faculty'] ?? '';
+                    $_SESSION['group_name'] = $user['group_name'] ?? '';
+                    $_SESSION['role'] = $user['role'];
+                    
+                    header('Location: survey.php');
+                    exit;
+                }
+            } else {
+                $error = 'Noto\'g\'ri parol! Default parol: 12345678';
             }
         } else {
-            $error = 'Noto\'g\'ri foydalanuvchi nomi yoki parol!';
+            $error = 'HEMIS ID topilmadi! Iltimos, avval talabalar ma\'lumotlarini import qiling.';
         }
     } else {
         $error = 'Barcha maydonlarni to\'ldiring!';
@@ -65,17 +94,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <form method="POST" action="">
                 <div class="form-group">
-                    <label for="username">Foydalanuvchi nomi:</label>
-                    <input type="text" id="username" name="username" required autofocus>
+                    <label for="username">HEMIS ID:</label>
+                    <input type="text" id="username" name="username" placeholder="HEMIS ID ni kiriting" required autofocus>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Parol:</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password" placeholder="Default: 12345678" required>
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Kirish</button>
             </form>
+            
+            <div class="login-info">
+                <p><strong>Eslatma:</strong></p>
+                <p>HEMIS ID bilan kirish uchun talabalar ma'lumotlari avval import qilinishi kerak.</p>
+                <p>Default parol: <strong>12345678</strong></p>
+            </div>
             
             <div class="login-links">
                 <p><a href="../index.php">← Asosiy sahifaga qaytish</a></p>
