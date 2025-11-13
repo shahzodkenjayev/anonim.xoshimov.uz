@@ -18,6 +18,11 @@ $employees_query = "SELECT id, full_name, position, department_uz, department_ru
 $employees_result = $conn->query($employees_query);
 $employees = $employees_result->fetchAll();
 
+// Barcha kafedralarni olish (filtrlash uchun)
+$departments_query = "SELECT DISTINCT department_uz FROM employees WHERE department_uz IS NOT NULL AND department_uz != '' ORDER BY department_uz";
+$departments_result = $conn->query($departments_query);
+$departments = $departments_result->fetchAll(PDO::FETCH_COLUMN);
+
 // Tilni o'rnatish (GET parametri orqali)
 if (isset($_GET['lang']) && in_array($_GET['lang'], ['uz', 'ru'])) {
     setUserLanguage($_GET['lang']);
@@ -126,12 +131,50 @@ $submitted_employees = $submitted_result;
             <h2><?php echo t('rate_employees'); ?></h2>
             <p class="info-text"><?php echo t('rate_employees_desc'); ?></p>
             
+            <!-- Qidirish va filtrlash paneli -->
+            <div class="filter-panel">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="search-input">🔍 <?php echo t('search_employee'); ?></label>
+                        <input type="text" id="search-input" class="form-control" placeholder="<?php echo t('search_placeholder'); ?>">
+                    </div>
+                    <div class="filter-group">
+                        <label for="position-filter">📋 <?php echo t('position'); ?></label>
+                        <select id="position-filter" class="form-control">
+                            <option value=""><?php echo t('all_positions'); ?></option>
+                            <option value="teacher"><?php echo t('teacher'); ?></option>
+                            <option value="dean"><?php echo t('dean'); ?></option>
+                            <option value="coordinator"><?php echo t('coordinator'); ?></option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="department-filter">🏛️ <?php echo t('department'); ?></label>
+                        <select id="department-filter" class="form-control">
+                            <option value=""><?php echo t('all_departments'); ?></option>
+                            <?php foreach ($departments as $dept): ?>
+                                <option value="<?php echo htmlspecialchars($dept); ?>"><?php echo htmlspecialchars($dept); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-buttons">
+                        <button type="button" id="search-btn" class="btn btn-primary"><?php echo t('search'); ?></button>
+                        <button type="button" id="clear-filters" class="btn btn-secondary"><?php echo t('clear'); ?></button>
+                    </div>
+                </div>
+                <div class="filter-results">
+                    <span id="results-count"><?php echo count($employees); ?> <?php echo t('employees_found'); ?></span>
+                </div>
+            </div>
+            
             <?php if (count($employees) > 0): ?>
                 <?php foreach ($employees as $employee): ?>
                     <?php 
                     $is_submitted = in_array($employee['id'], $submitted_employees);
                     ?>
-                    <div class="employee-card <?php echo $is_submitted ? 'submitted' : ''; ?>">
+                    <div class="employee-card <?php echo $is_submitted ? 'submitted' : ''; ?>" 
+                         data-name="<?php echo htmlspecialchars(strtolower($employee['full_name'])); ?>"
+                         data-position="<?php echo htmlspecialchars($employee['position']); ?>"
+                         data-department="<?php echo htmlspecialchars($employee['department_uz'] ?? ''); ?>">
                         <div class="employee-header">
                             <h3><?php echo htmlspecialchars($employee['full_name']); ?></h3>
                             <span class="position-badge"><?php echo getPositionName($employee['position']); ?></span>
@@ -184,6 +227,89 @@ $submitted_employees = $submitted_result;
             <?php endif; ?>
         </div>
     </div>
+    
+    <script>
+        // Qidirish va filtrlash funksiyalari
+        const searchInput = document.getElementById('search-input');
+        const positionFilter = document.getElementById('position-filter');
+        const departmentFilter = document.getElementById('department-filter');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        const searchBtn = document.getElementById('search-btn');
+        const resultsCount = document.getElementById('results-count');
+        const employeeCards = document.querySelectorAll('.employee-card');
+        
+        function filterEmployees() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedPosition = positionFilter.value;
+            const selectedDepartment = departmentFilter.value;
+            
+            let visibleCount = 0;
+            
+            employeeCards.forEach(card => {
+                const name = card.getAttribute('data-name') || '';
+                const position = card.getAttribute('data-position') || '';
+                const department = card.getAttribute('data-department') || '';
+                
+                // Qidirish tekshiruvi
+                const matchesSearch = !searchTerm || name.includes(searchTerm);
+                
+                // Lavozim tekshiruvi
+                const matchesPosition = !selectedPosition || position === selectedPosition;
+                
+                // Kafedra tekshiruvi
+                const matchesDepartment = !selectedDepartment || department === selectedDepartment;
+                
+                // Barcha shartlar bajarilsa, ko'rsatish
+                if (matchesSearch && matchesPosition && matchesDepartment) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Natijalar sonini yangilash
+            const lang = '<?php echo $current_lang; ?>';
+            const foundText = lang === 'ru' ? 'сотрудников найдено' : 'ta xodim topildi';
+            resultsCount.textContent = visibleCount + ' ' + foundText;
+            
+            // Agar hech narsa topilmasa, xabar ko'rsatish
+            if (visibleCount === 0) {
+                const noResults = document.getElementById('no-results-message');
+                if (!noResults) {
+                    const message = document.createElement('div');
+                    message.id = 'no-results-message';
+                    message.className = 'alert alert-info';
+                    message.textContent = lang === 'ru' ? 'Сотрудники не найдены. Измените фильтры.' : 'Hech qanday xodim topilmadi. Filtrlarni o\'zgartiring.';
+                    document.querySelector('.survey-section').appendChild(message);
+                }
+            } else {
+                const noResults = document.getElementById('no-results-message');
+                if (noResults) {
+                    noResults.remove();
+                }
+            }
+        }
+        
+        // Qidirish tugmasi
+        searchBtn.addEventListener('click', filterEmployees);
+        
+        // Enter tugmasi bosilganda qidirish
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filterEmployees();
+            }
+        });
+        
+        // Tozalash tugmasi
+        clearFiltersBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            positionFilter.value = '';
+            departmentFilter.value = '';
+            filterEmployees();
+        });
+    </script>
 </body>
 </html>
 
