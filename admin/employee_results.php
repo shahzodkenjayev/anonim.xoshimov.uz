@@ -156,17 +156,15 @@ $questions = $questions_stmt->fetchAll();
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="container">
-            <h1>Xodim Natijalari</h1>
-            <div class="user-info">
-                <a href="results" class="btn btn-secondary">← Orqaga</a>
-                <a href="../logout" class="btn btn-secondary">Chiqish</a>
+    <div class="admin-wrapper">
+        <?php include 'sidebar.php'; ?>
+        
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Xodim Natijalari</h1>
             </div>
-        </div>
-    </div>
-    
-    <div class="container">
+            
+            <div class="admin-content">
         <!-- Xodim ma'lumotlari -->
         <div class="employee-info-card">
             <h2><?php echo htmlspecialchars($employee['full_name']); ?></h2>
@@ -408,5 +406,8 @@ $questions = $questions_stmt->fetchAll();
             }
         });
     </script>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

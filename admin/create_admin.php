@@ -70,7 +70,15 @@ $admins = $admins_result->fetchAll();
     <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
 </head>
 <body>
-    <div class="container">
+    <div class="admin-wrapper">
+        <?php include 'sidebar.php'; ?>
+        
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Admin Yaratish yoki Parolni Yangilash</h1>
+            </div>
+            
+            <div class="admin-content">
         <div class="admin-section">
             <h1>Admin Yaratish yoki Parolni Yangilash</h1>
             
@@ -133,7 +141,8 @@ $admins = $admins_result->fetchAll();
                     <strong>⚠️ Xavfsizlik:</strong> Bu faylni admin yaratilgandan keyin o'chiring yoki .htaccess orqali himoyalang!
                 </div>
             </div>
-        </div>
+            </div>
+        </main>
     </div>
 </body>
 </html>

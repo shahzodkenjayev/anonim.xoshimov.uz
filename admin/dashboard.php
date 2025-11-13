@@ -35,18 +35,16 @@ $stats = $stats_result->fetch();
     <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
 </head>
 <body>
-    <div class="header">
-        <div class="container">
-            <h1>Admin Panel</h1>
-            <div class="user-info">
-                <span><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-                <a href="employees" class="btn btn-secondary">Xodimlar</a>
-                <a href="../logout" class="btn btn-secondary">Chiqish</a>
+    <div class="admin-wrapper">
+        <?php include 'sidebar.php'; ?>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Boshqaruv</h1>
             </div>
-        </div>
-    </div>
-    
-    <div class="container">
+            
+            <div class="admin-content">
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Jami Xodimlar</h3>
@@ -145,7 +143,8 @@ $stats = $stats_result->fetch();
             <?php else: ?>
                 <div class="alert alert-info">Hozircha xodimlar ro'yxati bo'sh. <a href="employees">Qo'shish</a></div>
             <?php endif; ?>
-        </div>
+            </div>
+        </main>
     </div>
     
     <script>

@@ -64,17 +64,15 @@ $questions = $questions_result->fetchAll();
     <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
 </head>
 <body>
-    <div class="header">
-        <div class="container">
-            <h1>Savollarni Boshqarish</h1>
-            <div class="user-info">
-                <a href="dashboard" class="btn btn-secondary">Orqaga</a>
-                <a href="../logout" class="btn btn-secondary">Chiqish</a>
+    <div class="admin-wrapper">
+        <?php include 'sidebar.php'; ?>
+        
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Savollarni Boshqarish</h1>
             </div>
-        </div>
-    </div>
-    
-    <div class="container">
+            
+            <div class="admin-content">
         <?php if ($message): ?>
             <div class="alert alert-<?php echo $message_type; ?>"><?php echo $message; ?></div>
         <?php endif; ?>
@@ -155,7 +153,8 @@ $questions = $questions_result->fetchAll();
             <?php else: ?>
                 <div class="alert alert-info">Hozircha savollar ro'yxati bo'sh.</div>
             <?php endif; ?>
-        </div>
+            </div>
+        </main>
     </div>
 </body>
 </html>

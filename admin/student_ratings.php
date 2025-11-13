@@ -97,17 +97,15 @@ $stats = $stats_stmt->fetch();
     <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
 </head>
 <body>
-    <div class="header">
-        <div class="container">
-            <h1>Talaba Baholari</h1>
-            <div class="user-info">
-                <a href="add_student" class="btn btn-secondary">← Orqaga</a>
-                <a href="../logout" class="btn btn-secondary">Chiqish</a>
+    <div class="admin-wrapper">
+        <?php include 'sidebar.php'; ?>
+        
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Talaba Baholari</h1>
             </div>
-        </div>
-    </div>
-    
-    <div class="container">
+            
+            <div class="admin-content">
         <!-- Talaba ma'lumotlari -->
         <div class="admin-section">
             <h2>Talaba Ma'lumotlari</h2>
@@ -288,6 +286,9 @@ $stats = $stats_stmt->fetch();
             }
         });
     </script>
+            </div>
+        </main>
+    </div>
 </body>
 </html>
 

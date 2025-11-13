@@ -92,17 +92,15 @@ $faculties = $faculties_result->fetchAll();
     <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
 </head>
 <body>
-    <div class="header">
-        <div class="container">
-            <h1>Xodimlarni Boshqarish</h1>
-            <div class="user-info">
-                <a href="dashboard" class="btn btn-secondary">Orqaga</a>
-                <a href="../logout" class="btn btn-secondary">Chiqish</a>
+    <div class="admin-wrapper">
+        <?php include 'sidebar.php'; ?>
+        
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Xodimlarni Boshqarish</h1>
             </div>
-        </div>
-    </div>
-    
-    <div class="container">
+            
+            <div class="admin-content">
         <?php if ($message): ?>
             <div class="alert alert-<?php echo $message_type; ?>"><?php echo $message; ?></div>
         <?php endif; ?>
@@ -185,6 +183,8 @@ $faculties = $faculties_result->fetchAll();
                 <div class="alert alert-info">Hozircha xodimlar ro'yxati bo'sh.</div>
             <?php endif; ?>
         </div>
+            </div>
+        </main>
     </div>
     
     <!-- Edit Modal -->
