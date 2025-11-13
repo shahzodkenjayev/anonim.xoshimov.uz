@@ -1,13 +1,14 @@
 <?php
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/base_path.php';
 
 // Agar login qilgan bo'lsa, tegishli sahifaga yo'naltirish
 if (isLoggedIn()) {
     if (isAdmin()) {
-        header('Location: dashboard.php');
+        header('Location: dashboard');
     } else {
-        header('Location: ../student/survey.php');
+        header('Location: ../student/survey');
     }
     exit;
 }
@@ -27,14 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($password, $user['password'])) {
             // Faqat adminlar kirishi mumkin
             if ($user['role'] !== 'admin') {
-                $error = 'Bu sahifa faqat adminlar uchun. <a href="../student/login.php">Talaba login</a>';
+                $error = 'Bu sahifa faqat adminlar uchun. <a href="../student/login">Talaba login</a>';
             } else {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['full_name'] = $user['full_name'];
                 $_SESSION['role'] = $user['role'];
                 
-                header('Location: dashboard.php');
+                header('Location: dashboard');
                 exit;
             }
         } else {
@@ -51,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Kirish</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
     <style>
         /* Admin login sahifasi uchun maxsus stillar */
         body {
@@ -183,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
             
             <div class="login-links">
-                <p><a href="../index.php">← Asosiy sahifaga qaytish</a></p>
+                <p><a href="../">← Asosiy sahifaga qaytish</a></p>
             </div>
         </div>
     </div>

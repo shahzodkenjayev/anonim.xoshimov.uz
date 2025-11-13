@@ -1,0 +1,86 @@
+# PHP kengaytmasini yashirish (URL Rewrite)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # .php kengaytmasini yashirish
+    # Agar URL .php bilan tugamasa va fayl mavjud bo'lsa
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}.php -f
+    RewriteRule ^(.*)$ $1.php [L,QSA]
+    
+    # Agar URL .php bilan tugasa, uni olib tashlash (ixtiyoriy)
+    RewriteCond %{THE_REQUEST} \s/+(.+?)\.php[\s?] [NC]
+    RewriteRule ^ /%1 [R=301,L]
+</IfModule>
+
+# .env faylini bloklash
+<FilesMatch "\.env$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# .env.* fayllarni bloklash (masalan: .env.local, .env.production)
+<FilesMatch "^\.env\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# config/ papkasini bloklash
+<IfModule mod_rewrite.c>
+    RewriteRule ^config/ - [F,L]
+</IfModule>
+
+# config/ papkasidagi barcha fayllarni bloklash
+<DirectoryMatch "^.*/config/">
+    Order allow,deny
+    Deny from all
+</DirectoryMatch>
+
+# includes/ papkasidagi PHP fayllarni to'g'ridan-to'g'ri ochishni bloklash
+<IfModule mod_rewrite.c>
+    RewriteRule ^includes/.*\.php$ - [F,L]
+</IfModule>
+
+# Xavfsizlik: Sensitive fayllarni bloklash
+<FilesMatch "\.(sql|log|ini|conf|bak|backup|old|tmp)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Xavfsizlik: Git fayllarini bloklash
+<IfModule mod_rewrite.c>
+    RewriteRule ^\.git - [F,L]
+    RewriteRule ^\.gitignore - [F,L]
+</IfModule>
+
+# Xavfsizlik: Composer fayllarini bloklash
+<IfModule mod_rewrite.c>
+    RewriteRule ^composer\.(json|lock)$ - [F,L]
+</IfModule>
+
+# Xavfsizlik: README va boshqa dokumentatsiya fayllarini bloklash (ixtiyoriy)
+# <FilesMatch "^(README|CHANGELOG|LICENSE|DEPLOYMENT|ENV_SETUP|GIT_SETUP|QUICK_START|REMOTE_SETUP_GUIDE)\.(md|txt)$">
+#     Order allow,deny
+#     Deny from all
+# </FilesMatch>
+
+# PHP xavfsizlik sozlamalari
+<IfModule mod_php7.c>
+    php_flag display_errors Off
+    php_flag log_errors On
+</IfModule>
+
+# Directory listing ni o'chirish
+Options -Indexes
+
+# Default charset
+AddDefaultCharset UTF-8
+
+# MIME types
+<IfModule mod_mime.c>
+    AddType application/javascript js
+    AddType text/css css
+</IfModule>
+

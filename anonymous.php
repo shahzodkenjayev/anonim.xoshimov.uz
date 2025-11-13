@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="container">
             <h1><?php echo t('anonymous_vote'); ?></h1>
             <div class="user-info">
-                <a href="index.php" class="btn btn-secondary">← <?php echo t('home_page'); ?></a>
+                <a href="/" class="btn btn-secondary">← <?php echo t('home_page'); ?></a>
             </div>
         </div>
     </div>

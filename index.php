@@ -11,9 +11,9 @@ $current_lang = getUserLanguage();
 // Agar login qilgan bo'lsa, tegishli sahifaga yo'naltirish
 if (isLoggedIn()) {
     if (isAdmin()) {
-        header('Location: admin/dashboard.php');
+        header('Location: admin/dashboard');
     } else {
-        header('Location: student/survey.php');
+        header('Location: student/survey');
     }
     exit;
 }
@@ -54,14 +54,14 @@ if (isLoggedIn()) {
                     <div class="option-icon">🗳️</div>
                     <h2><?php echo t('anonymous_vote'); ?></h2>
                     <p><?php echo t('anonymous_vote_desc'); ?></p>
-                    <a href="anonymous.php" class="btn btn-primary btn-large"><?php echo t('vote_button'); ?></a>
+                    <a href="anonymous" class="btn btn-primary btn-large"><?php echo t('vote_button'); ?></a>
                 </div>
                 
                 <div class="option-card">
                     <div class="option-icon">🔐</div>
                     <h2><?php echo t('login'); ?></h2>
                     <p><?php echo t('login_desc'); ?></p>
-                    <a href="student/login.php" class="btn btn-secondary btn-large"><?php echo t('login_button'); ?></a>
+                    <a href="student/login" class="btn btn-secondary btn-large"><?php echo t('login_button'); ?></a>
                 </div>
             </div>
             
@@ -84,7 +84,7 @@ if (isLoggedIn()) {
             </div>
             
             <div class="login-links">
-                <p><?php echo t('admin_login'); ?> <a href="admin/login.php"><?php echo t('admin_panel'); ?></a></p>
+                <p><?php echo t('admin_login'); ?> <a href="admin/login"><?php echo t('admin_panel'); ?></a></p>
             </div>
         </div>
     </div>

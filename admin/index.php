@@ -10,12 +10,12 @@ require_once '../includes/functions.php';
 
 // Agar login qilgan bo'lsa, dashboard'ga yo'naltirish
 if (isLoggedIn() && isAdmin()) {
-    header('Location: dashboard.php');
+    header('Location: dashboard');
     exit;
 }
 
 // Aks holda login sahifasiga yo'naltirish
-header('Location: login.php');
+header('Location: login');
 exit;
 ?>
 

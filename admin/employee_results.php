@@ -1,17 +1,18 @@
 <?php
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/base_path.php';
 
 // Admin tekshirish
 if (!isLoggedIn() || !isAdmin()) {
-    header('Location: login.php');
+    header('Location: login');
     exit;
 }
 
 $employee_id = intval($_GET['id'] ?? 0);
 
 if ($employee_id <= 0) {
-    header('Location: dashboard.php');
+    header('Location: dashboard');
     exit;
 }
 
@@ -23,7 +24,7 @@ $employee_stmt->execute([$employee_id]);
 $employee = $employee_stmt->fetch();
 
 if (!$employee) {
-    header('Location: dashboard.php');
+    header('Location: dashboard');
     exit;
 }
 
@@ -62,15 +63,15 @@ $stats = $stats_stmt->fetch();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xodim Natijalari - <?php echo htmlspecialchars($employee['full_name']); ?></title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
 </head>
 <body>
     <div class="header">
         <div class="container">
             <h1>Xodim Natijalari</h1>
             <div class="user-info">
-                <a href="dashboard.php" class="btn btn-secondary">Orqaga</a>
-                <a href="../logout.php" class="btn btn-secondary">Chiqish</a>
+                <a href="dashboard" class="btn btn-secondary">Orqaga</a>
+                <a href="../logout" class="btn btn-secondary">Chiqish</a>
             </div>
         </div>
     </div>

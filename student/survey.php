@@ -4,7 +4,7 @@ require_once '../includes/functions.php';
 
 // Login tekshirish
 if (!isLoggedIn() || isAdmin()) {
-    header('Location: login.php');
+    header('Location: login');
     exit;
 }
 
@@ -104,7 +104,7 @@ $submitted_employees = $submitted_result;
             <h1>Anonim So'rovnoma</h1>
             <div class="user-info">
                 <span><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-                <a href="../logout.php" class="btn btn-secondary">Chiqish</a>
+                <a href="../logout" class="btn btn-secondary">Chiqish</a>
             </div>
         </div>
     </div>

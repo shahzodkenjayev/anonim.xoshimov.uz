@@ -5,9 +5,9 @@ require_once '../includes/functions.php';
 // Agar login qilgan bo'lsa, tegishli sahifaga yo'naltirish
 if (isLoggedIn()) {
     if (isAdmin()) {
-        header('Location: ../admin/dashboard.php');
+        header('Location: ../admin/dashboard');
     } else {
-        header('Location: survey.php');
+        header('Location: survey');
     }
     exit;
 }
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($password_valid) {
                 // Faqat talabalar kirishi mumkin
                 if ($user['role'] === 'admin') {
-                    $error = 'Adminlar uchun alohida login sahifasi mavjud. <a href="../admin/login.php">Admin login</a>';
+                    $error = 'Adminlar uchun alohida login sahifasi mavjud. <a href="../admin/login">Admin login</a>';
                 } else {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'] ?? $user['hemis_id'];
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['group_name'] = $user['group_name'] ?? '';
                     $_SESSION['role'] = $user['role'];
                     
-                    header('Location: survey.php');
+                    header('Location: survey');
                     exit;
                 }
             } else {
@@ -113,8 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             
             <div class="login-links">
-                <p><a href="../index.php">← Asosiy sahifaga qaytish</a></p>
-                <p><a href="../anonymous.php">Anonim ovoz berish</a></p>
+                <p><a href="../">← Asosiy sahifaga qaytish</a></p>
+                <p><a href="../anonymous">Anonim ovoz berish</a></p>
             </div>
         </div>
     </div>

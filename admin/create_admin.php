@@ -6,6 +6,7 @@
 
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/base_path.php';
 
 $conn = getDBConnection();
 $message = '';
@@ -66,7 +67,7 @@ $admins = $admins_result->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Yaratish</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
 </head>
 <body>
     <div class="container">

@@ -1,10 +1,11 @@
 <?php
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/base_path.php';
 
 // Admin tekshirish
 if (!isLoggedIn() || !isAdmin()) {
-    header('Location: login.php');
+    header('Location: login');
     exit;
 }
 
@@ -31,7 +32,7 @@ $stats = $stats_result->fetch();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Boshqaruv</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
 </head>
 <body>
     <div class="header">
@@ -39,8 +40,8 @@ $stats = $stats_result->fetch();
             <h1>Admin Panel</h1>
             <div class="user-info">
                 <span><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-                <a href="employees.php" class="btn btn-secondary">Xodimlar</a>
-                <a href="../logout.php" class="btn btn-secondary">Chiqish</a>
+                <a href="employees" class="btn btn-secondary">Xodimlar</a>
+                <a href="../logout" class="btn btn-secondary">Chiqish</a>
             </div>
         </div>
     </div>
@@ -62,14 +63,12 @@ $stats = $stats_result->fetch();
         </div>
         
         <div class="admin-section">
-            <h2>Xodimlar ro'yxati</h2>
-            <a href="employees.php" class="btn btn-primary">Xodimlarni boshqarish</a>
-            <a href="../import_teachers.php" class="btn btn-primary">O'qituvchilarni import qilish</a>
-            <a href="../import_students_from_postgresql.php" class="btn btn-primary">Talabalarni PostgreSQL dan import qilish</a>
-            <a href="add_student.php" class="btn btn-primary">Talabalarni boshqarish</a>
-            <a href="create_admin.php" class="btn btn-primary">Admin qo'shish</a>
-            <a href="results.php" class="btn btn-primary">Natijalarni ko'rish</a>
-            <a href="questions.php" class="btn btn-primary">Savollarni boshqarish</a>
+            <h2>Boshqaruv</h2>
+            <a href="employees" class="btn btn-primary">Xodimlarni boshqarish</a>
+            <a href="add_student" class="btn btn-primary">Talabalarni boshqarish</a>
+            <a href="create_admin" class="btn btn-primary">Admin qo'shish</a>
+            <a href="results" class="btn btn-primary">Natijalarni ko'rish</a>
+            <a href="questions" class="btn btn-primary">Savollarni boshqarish</a>
         </div>
         
         <div class="admin-section">
@@ -93,14 +92,14 @@ $stats = $stats_result->fetch();
                                 <td><?php echo getPositionName($employee['position']); ?></td>
                                 <td><?php echo htmlspecialchars($employee['department_uz'] ?? '-'); ?></td>
                                 <td>
-                                    <a href="employee_results.php?id=<?php echo $employee['id']; ?>" class="btn btn-small">Natijalar</a>
+                                    <a href="employee_results?id=<?php echo $employee['id']; ?>" class="btn btn-small">Natijalar</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             <?php else: ?>
-                <div class="alert alert-info">Hozircha xodimlar ro'yxati bo'sh. <a href="employees.php">Qo'shish</a></div>
+                <div class="alert alert-info">Hozircha xodimlar ro'yxati bo'sh. <a href="employees">Qo'shish</a></div>
             <?php endif; ?>
         </div>
     </div>

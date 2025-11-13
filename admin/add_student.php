@@ -1,10 +1,11 @@
 <?php
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/base_path.php';
 
 // Admin tekshirish
 if (!isLoggedIn() || !isAdmin()) {
-    header('Location: login.php');
+    header('Location: login');
     exit;
 }
 
@@ -56,15 +57,15 @@ $students = $students_result->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Talabalarni Boshqarish</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo css('style.css'); ?>">
 </head>
 <body>
     <div class="header">
         <div class="container">
             <h1>Talabalarni Boshqarish</h1>
             <div class="user-info">
-                <a href="dashboard.php" class="btn btn-secondary">Orqaga</a>
-                <a href="../logout.php" class="btn btn-secondary">Chiqish</a>
+                <a href="dashboard" class="btn btn-secondary">Orqaga</a>
+                <a href="../logout" class="btn btn-secondary">Chiqish</a>
             </div>
         </div>
     </div>
