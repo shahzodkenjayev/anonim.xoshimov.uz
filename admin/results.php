@@ -12,17 +12,25 @@ if (!isLoggedIn() || !isAdmin()) {
 $conn = getDBConnection();
 
 // Barcha xodimlar va ularning natijalari
+// Javoblar sonini hisoblash: survey_submissions jadvalidan (talabalar uchun)
+// Eslatma: Anonim javoblar survey_submissions jadvaliga yozilmaydi, shuning uchun survey_responses jadvalidan ham hisoblaymiz
 $results_query = "SELECT 
     e.id,
     e.full_name,
     e.position,
     e.department_uz,
-    COUNT(DISTINCT ss.user_id) as total_responses,
-    AVG(sr.rating) as avg_rating
+    (
+        SELECT COUNT(DISTINCT ss.id)
+        FROM survey_submissions ss 
+        WHERE ss.employee_id = e.id
+    ) as total_responses,
+    (
+        SELECT AVG(sr.rating)
+        FROM survey_responses sr
+        WHERE sr.employee_id = e.id
+        AND sr.rating IS NOT NULL
+    ) as avg_rating
     FROM employees e
-    LEFT JOIN survey_submissions ss ON e.id = ss.employee_id
-    LEFT JOIN survey_responses sr ON e.id = sr.employee_id AND sr.rating IS NOT NULL
-    GROUP BY e.id
     ORDER BY e.position, e.full_name";
 
 $results_result = $conn->query($results_query);
