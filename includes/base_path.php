@@ -6,10 +6,21 @@
 
 // Base URL ni aniqlash
 function getBaseUrl() {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || 
+                 (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) 
+                 ? 'https://' : 'http://';
     $host = $_SERVER['HTTP_HOST'];
-    $script = $_SERVER['SCRIPT_NAME'];
-    $path = dirname($script);
+    
+    // REQUEST_URI dan base path ni olish
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+    
+    // Root sahifada bo'lsa
+    if ($scriptName === '/index.php' || $scriptName === '/') {
+        return $protocol . $host;
+    }
+    
+    $path = dirname($scriptName);
     
     // Agar admin papkasida bo'lsa, bir daraja yuqoriga chiqamiz
     if (strpos($path, '/admin') !== false) {
@@ -21,8 +32,8 @@ function getBaseUrl() {
         $path = dirname($path);
     }
     
-    // Agar path '/' bo'lsa, bo'sh qoldiramiz
-    if ($path === '/' || $path === '\\') {
+    // Agar path '/' bo'lsa yoki root bo'lsa, bo'sh qoldiramiz
+    if ($path === '/' || $path === '\\' || $path === '.') {
         $path = '';
     }
     
@@ -76,13 +87,19 @@ function generateMetaTags($title, $description, $image = null, $type = 'website'
     
     // Agar URL berilmagan bo'lsa, joriy URL ni olish
     if ($url === null) {
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-        $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || 
+                     (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) 
+                     ? 'https://' : 'http://';
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+        // Query string ni olib tashlash (meta teglar uchun)
+        $requestUri = strtok($requestUri, '?');
+        $url = $protocol . $_SERVER['HTTP_HOST'] . $requestUri;
     }
     
     // Agar image berilmagan bo'lsa, default image
     if ($image === null) {
-        $image = $baseUrl . '/assets/images/og-image.png'; // Default image
+        // Default image yo'q bo'lsa, site logo yoki favicon ishlatamiz
+        $image = $baseUrl . '/assets/images/og-image.png';
     } else {
         // Agar image relative path bo'lsa, absolute qilamiz
         if (strpos($image, 'http') !== 0) {
@@ -93,20 +110,24 @@ function generateMetaTags($title, $description, $image = null, $type = 'website'
     $siteName = 'Anonim So\'rovnoma';
     $locale = getUserLanguage() === 'ru' ? 'ru_RU' : 'uz_UZ';
     
+    // Meta teglarni yaratish
     $meta = '';
-    $meta .= '<meta property="og:title" content="' . htmlspecialchars($title) . '">' . "\n";
-    $meta .= '<meta property="og:description" content="' . htmlspecialchars($description) . '">' . "\n";
-    $meta .= '<meta property="og:image" content="' . htmlspecialchars($image) . '">' . "\n";
-    $meta .= '<meta property="og:url" content="' . htmlspecialchars($url) . '">' . "\n";
-    $meta .= '<meta property="og:type" content="' . htmlspecialchars($type) . '">' . "\n";
-    $meta .= '<meta property="og:site_name" content="' . htmlspecialchars($siteName) . '">' . "\n";
-    $meta .= '<meta property="og:locale" content="' . htmlspecialchars($locale) . '">' . "\n";
+    $meta .= '<meta property="og:title" content="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '">' . "\n";
+    $meta .= '<meta property="og:description" content="' . htmlspecialchars($description, ENT_QUOTES, 'UTF-8') . '">' . "\n";
+    $meta .= '<meta property="og:image" content="' . htmlspecialchars($image, ENT_QUOTES, 'UTF-8') . '">' . "\n";
+    $meta .= '<meta property="og:image:width" content="1200">' . "\n";
+    $meta .= '<meta property="og:image:height" content="630">' . "\n";
+    $meta .= '<meta property="og:image:type" content="image/png">' . "\n";
+    $meta .= '<meta property="og:url" content="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '">' . "\n";
+    $meta .= '<meta property="og:type" content="' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . '">' . "\n";
+    $meta .= '<meta property="og:site_name" content="' . htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8') . '">' . "\n";
+    $meta .= '<meta property="og:locale" content="' . htmlspecialchars($locale, ENT_QUOTES, 'UTF-8') . '">' . "\n";
     
     // Twitter Card
     $meta .= '<meta name="twitter:card" content="summary_large_image">' . "\n";
-    $meta .= '<meta name="twitter:title" content="' . htmlspecialchars($title) . '">' . "\n";
-    $meta .= '<meta name="twitter:description" content="' . htmlspecialchars($description) . '">' . "\n";
-    $meta .= '<meta name="twitter:image" content="' . htmlspecialchars($image) . '">' . "\n";
+    $meta .= '<meta name="twitter:title" content="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '">' . "\n";
+    $meta .= '<meta name="twitter:description" content="' . htmlspecialchars($description, ENT_QUOTES, 'UTF-8') . '">' . "\n";
+    $meta .= '<meta name="twitter:image" content="' . htmlspecialchars($image, ENT_QUOTES, 'UTF-8') . '">' . "\n";
     
     return $meta;
 }
