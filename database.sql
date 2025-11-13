@@ -59,7 +59,7 @@ CREATE TABLE survey_submissions (
 
 -- Default admin foydalanuvchi (username: admin, password: admin123)
 INSERT INTO users (username, password, full_name, role) VALUES 
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrator', 'admin');
+('admin', '$2y$10$/n3TI7ZQuSPQsDjT0YzGPefOpq0h25PaDvCuBnhir4A.kHk1Nml72', 'Administrator', 'admin');
 -- Parol: admin123 (bcrypt hash)
 
 -- Namuna savollar

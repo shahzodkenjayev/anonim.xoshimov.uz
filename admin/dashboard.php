@@ -66,6 +66,7 @@ $stats = $stats_result->fetch();
             <a href="employees.php" class="btn btn-primary">Xodimlarni boshqarish</a>
             <a href="../import_teachers.php" class="btn btn-primary">O'qituvchilarni import qilish</a>
             <a href="add_student.php" class="btn btn-primary">Talabalarni boshqarish</a>
+            <a href="create_admin.php" class="btn btn-primary">Admin qo'shish</a>
             <a href="results.php" class="btn btn-primary">Natijalarni ko'rish</a>
             <a href="questions.php" class="btn btn-primary">Savollarni boshqarish</a>
         </div>
