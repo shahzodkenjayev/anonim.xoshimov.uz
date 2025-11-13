@@ -18,9 +18,6 @@ if ($current_page === 'employee_results') {
 <aside class="admin-sidebar">
     <div class="sidebar-header">
         <h2>Admin Panel</h2>
-        <div class="user-info-sidebar">
-            <span class="user-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-        </div>
     </div>
     <nav class="sidebar-nav">
         <ul>
@@ -62,6 +59,12 @@ if ($current_page === 'employee_results') {
             </li>
             <li class="sidebar-divider"></li>
             <li>
+                <a href="settings" class="nav-link <?php echo ($current_page === 'settings') ? 'active' : ''; ?>">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Sozlamalar</span>
+                </a>
+            </li>
+            <li>
                 <a href="../logout" class="nav-link logout-link">
                     <span class="nav-icon">🚪</span>
                     <span class="nav-text">Chiqish</span>
@@ -69,5 +72,14 @@ if ($current_page === 'employee_results') {
             </li>
         </ul>
     </nav>
+    <div class="sidebar-footer">
+        <div class="user-info-sidebar">
+            <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['full_name'], 0, 1)); ?></div>
+            <div class="user-details">
+                <span class="user-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
+                <span class="user-username">@<?php echo htmlspecialchars($_SESSION['username']); ?></span>
+            </div>
+        </div>
+    </div>
 </aside>
 
