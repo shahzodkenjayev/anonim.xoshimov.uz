@@ -34,45 +34,6 @@ if (isLoggedIn()) {
     echo generateMetaTags($pageTitle, $pageDescription);
     ?>
     <link rel="stylesheet" href="assets/css/style.css">
-    <script>
-        // Linkni nusxalash funksiyasi (Telegram cache uchun timestamp bilan)
-        function copyLinkToClipboard() {
-            const url = window.location.href.split('?')[0]; // Query string ni olib tashlash
-            const timestamp = Date.now();
-            const linkWithTimestamp = url + (url.includes('?') ? '&' : '?') + 'v=' + timestamp;
-            
-            // Clipboard API
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(linkWithTimestamp).then(function() {
-                    alert('Link nusxalandi! Telegram\'da yuborish uchun tayyor: ' + linkWithTimestamp);
-                }).catch(function(err) {
-                    // Fallback: eski usul
-                    fallbackCopyTextToClipboard(linkWithTimestamp);
-                });
-            } else {
-                fallbackCopyTextToClipboard(linkWithTimestamp);
-            }
-        }
-        
-        // Fallback: eski browserlar uchun
-        function fallbackCopyTextToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";
-            textArea.style.left = "-999999px";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                alert('Link nusxalandi! Telegram\'da yuborish uchun tayyor: ' + text);
-            } catch (err) {
-                console.error('Fallback: Copy qilishda xatolik', err);
-                prompt('Linkni nusxalash uchun quyidagi matnni tanlang va Ctrl+C bosing:', text);
-            }
-            document.body.removeChild(textArea);
-        }
-    </script>
 </head>
 <body>
     <div class="language-selector-top">
@@ -133,20 +94,6 @@ if (isLoggedIn()) {
             
             <div class="login-links">
                 <p><?php echo t('admin_login'); ?> <a href="admin/login"><?php echo t('admin_panel'); ?></a></p>
-            </div>
-            
-            <!-- Linkni nusxalash tugmasi (Telegram cache uchun) -->
-            <div style="margin-top: 30px; text-align: center; padding: 20px; background: #f9f9f9; border-radius: 8px;">
-                <p style="margin-bottom: 15px; color: #666;">
-                    <strong>📱 Telegram'da ulashish uchun:</strong><br>
-                    Quyidagi tugmani bosing va linkni Telegram'da yuboring
-                </p>
-                <button onclick="copyLinkToClipboard()" style="background: #0088cc; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 500;">
-                    📋 Linkni Nusxalash (Telegram uchun)
-                </button>
-                <p style="margin-top: 10px; font-size: 12px; color: #999;">
-                    Link avtomatik ravishda timestamp bilan nusxalanadi
-                </p>
             </div>
         </div>
     </div>
