@@ -1,0 +1,32 @@
+# PHP
+*.log
+*.cache
+*.tmp
+.htaccess.local
+
+# Database config (xavfsizlik uchun)
+config/database.local.php
+
+# Environment variables (xavfsizlik uchun)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+test_connection.php
+
+# Temporary files
+*.bak
+*.backup
+

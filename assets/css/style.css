@@ -1,0 +1,527 @@
+/* Umumiy stillar */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.header h1 {
+  color: #667eea;
+  font-size: 24px;
+}
+
+.user-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Login sahifa */
+.login-box {
+  background: white;
+  border-radius: 15px;
+  padding: 40px;
+  max-width: 450px;
+  margin: 100px auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.login-box h1 {
+  color: #667eea;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.login-box h2 {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.login-info {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.login-info p {
+  margin: 5px 0;
+}
+
+/* Formalar */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+/* Tugmalar */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+/* Alert xabarlar */
+.alert {
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.alert-info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+/* So'rovnoma bo'limlari */
+.survey-section {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.survey-section h2 {
+  color: #667eea;
+  margin-bottom: 15px;
+}
+
+.info-text {
+  color: #666;
+  margin-bottom: 25px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Xodim kartasi */
+.employee-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s;
+}
+
+.employee-card:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.employee-card.submitted {
+  opacity: 0.7;
+  background: #e9ecef;
+}
+
+.employee-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.employee-header h3 {
+  color: #333;
+  font-size: 20px;
+}
+
+.position-badge {
+  background: #667eea;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.department {
+  color: #666;
+  font-size: 14px;
+}
+
+.submitted-badge {
+  background: #28a745;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* Savollar */
+.question-group {
+  margin-bottom: 25px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.question-label {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.rating-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rating-option {
+  cursor: pointer;
+  padding: 10px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s;
+  background: white;
+}
+
+.rating-option:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.rating-option input[type="radio"] {
+  display: none;
+}
+
+.rating-option input[type="radio"]:checked + .star {
+  color: #667eea;
+  font-weight: bold;
+}
+
+.star {
+  font-size: 18px;
+  color: #999;
+}
+
+/* Admin panel */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.stat-number {
+  font-size: 36px;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.admin-section {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.admin-section h2 {
+  color: #667eea;
+  margin-bottom: 20px;
+}
+
+/* Jadval */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.data-table th {
+  background: #f8f9fa;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.data-table tr:hover {
+  background: #f8f9fa;
+}
+
+/* Form inline */
+.form-inline {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.form-inline .form-group {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 0;
+}
+
+.form-inline .full-width {
+  flex: 100%;
+}
+
+/* Natijalar */
+.employee-info-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.employee-info-card h2 {
+  color: #667eea;
+  margin-bottom: 15px;
+}
+
+.stats-inline {
+  display: flex;
+  gap: 30px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.stats-inline span {
+  color: #666;
+}
+
+.result-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+  border-left: 4px solid #667eea;
+}
+
+.result-card h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.rating-result {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.avg-rating {
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.stars {
+  font-size: 20px;
+  color: #ffc107;
+}
+
+.stars-small {
+  font-size: 14px;
+  color: #ffc107;
+  margin-left: 5px;
+}
+
+.response-count {
+  color: #666;
+  font-size: 14px;
+}
+
+.text-responses {
+  margin-top: 15px;
+}
+
+.text-response-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border-left: 3px solid #667eea;
+}
+
+.text-response-item p {
+  color: #333;
+  margin: 0;
+}
+
+.no-data {
+  color: #999;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header .container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .login-box {
+    margin: 50px auto;
+    padding: 30px 20px;
+  }
+
+  .form-inline {
+    flex-direction: column;
+  }
+
+  .form-inline .form-group {
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .data-table {
+    font-size: 14px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 8px;
+  }
+}
