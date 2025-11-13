@@ -61,7 +61,7 @@ if (isLoggedIn()) {
                     <div class="option-icon">🔐</div>
                     <h2><?php echo t('login'); ?></h2>
                     <p><?php echo t('login_desc'); ?></p>
-                    <a href="student/login" class="btn btn-secondary btn-large"><?php echo t('login_button'); ?></a>
+                    <a href="student/login?lang=<?php echo $current_lang; ?>" class="btn btn-secondary btn-large"><?php echo t('login_button'); ?></a>
                 </div>
             </div>
             

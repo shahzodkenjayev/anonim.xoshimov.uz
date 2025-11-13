@@ -2,6 +2,12 @@
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 
+// Tilni o'rnatish (GET parametri orqali)
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['uz', 'ru'])) {
+    setUserLanguage($_GET['lang']);
+}
+$current_lang = getUserLanguage();
+
 // Agar login qilgan bo'lsa, tegishli sahifaga yo'naltirish
 if (isLoggedIn()) {
     if (isAdmin()) {
@@ -75,18 +81,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="<?php echo $current_lang; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Talaba - Tizimga Kirish</title>
+    <title><?php echo $current_lang === 'ru' ? 'Студент - Вход в систему' : 'Talaba - Tizimga Kirish'; ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
+    <div class="language-selector-top">
+        <div class="container">
+            <div class="lang-switcher">
+                <a href="?lang=uz" class="lang-option <?php echo $current_lang === 'uz' ? 'active' : ''; ?>">
+                    <span class="flag-icon"><?php echo getFlagSvg('uz'); ?></span>
+                    <span>O'zbek</span>
+                </a>
+                <a href="?lang=ru" class="lang-option <?php echo $current_lang === 'ru' ? 'active' : ''; ?>">
+                    <span class="flag-icon"><?php echo getFlagSvg('ru'); ?></span>
+                    <span>Русский</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <div class="login-box">
-            <h1>Talaba Tizimiga Kirish</h1>
-            <h2>Fikringizni bildiring</h2>
+            <h1><?php echo $current_lang === 'ru' ? 'Студент - Вход в систему' : 'Talaba Tizimiga Kirish'; ?></h1>
+            <h2><?php echo $current_lang === 'ru' ? 'Выскажите свое мнение' : 'Fikringizni bildiring'; ?></h2>
             
             <?php if ($error): ?>
                 <div class="alert alert-error"><?php echo $error; ?></div>
@@ -94,26 +115,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <form method="POST" action="">
                 <div class="form-group">
-                    <label for="username">HEMIS ID:</label>
-                    <input type="text" id="username" name="username" placeholder="HEMIS ID ni kiriting" required autofocus>
+                    <label for="username"><?php echo $current_lang === 'ru' ? 'HEMIS ID:' : 'HEMIS ID:'; ?></label>
+                    <input type="text" id="username" name="username" placeholder="<?php echo $current_lang === 'ru' ? 'Введите HEMIS ID' : 'HEMIS ID ni kiriting'; ?>" required autofocus>
                 </div>
                 
                 <div class="form-group">
-                    <label for="password">Parol:</label>
-                    <input type="password" id="password" name="password" placeholder="Default: 12345678" required>
+                    <label for="password"><?php echo $current_lang === 'ru' ? 'Пароль:' : 'Parol:'; ?></label>
+                    <input type="password" id="password" name="password" placeholder="<?php echo $current_lang === 'ru' ? 'По умолчанию: 12345678' : 'Default: 12345678'; ?>" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Kirish</button>
+                <button type="submit" class="btn btn-primary"><?php echo $current_lang === 'ru' ? 'Войти' : 'Kirish'; ?></button>
             </form>
             
             <div class="login-info">
-                <p><strong>Eslatma:</strong></p>
-                <p>Default parol: <strong>12345678</strong></p>
+                <p><strong><?php echo $current_lang === 'ru' ? 'Примечание:' : 'Eslatma:'; ?></strong></p>
+                <p><?php echo $current_lang === 'ru' ? 'Пароль по умолчанию:' : 'Default parol:'; ?> <strong>12345678</strong></p>
             </div>
             
             <div class="login-links">
-                <p><a href="../">← Asosiy sahifaga qaytish</a></p>
-                <p><a href="../anonymous">Anonim ovoz berish</a></p>
+                <p><a href="../?lang=<?php echo $current_lang; ?>">← <?php echo $current_lang === 'ru' ? 'Вернуться на главную' : 'Asosiy sahifaga qaytish'; ?></a></p>
+                <p><a href="../anonymous?lang=<?php echo $current_lang; ?>"><?php echo $current_lang === 'ru' ? 'Анонимное голосование' : 'Anonim ovoz berish'; ?></a></p>
             </div>
         </div>
     </div>
