@@ -18,8 +18,14 @@ $employees_query = "SELECT id, full_name, position, department_uz, department_ru
 $employees_result = $conn->query($employees_query);
 $employees = $employees_result->fetchAll();
 
-// Savollarni olish
-$questions_query = "SELECT id, question_text, question_type, position_type FROM questions ORDER BY id";
+// Tilni o'rnatish (GET parametri orqali)
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['uz', 'ru'])) {
+    setUserLanguage($_GET['lang']);
+}
+$current_lang = getUserLanguage();
+
+// Savollarni olish (ikki tilni qo'llab-quvvatlash)
+$questions_query = "SELECT id, question_text, question_text_uz, question_text_ru, question_type, position_type FROM questions ORDER BY position_type, id";
 $questions_result = $conn->query($questions_query);
 $questions = $questions_result->fetchAll();
 
@@ -106,6 +112,13 @@ $submitted_employees = $submitted_result;
         <div class="survey-section">
             <h2>Xodimlarni baholash</h2>
             <p class="info-text">Quyidagi xodimlar haqida anonim so'rovnoma to'ldiring. Har bir xodimga faqat bir marta javob bera olasiz.</p>
+            <div class="language-selector" style="text-align: right; margin-bottom: 20px;">
+                <label for="lang-select">Til / Язык:</label>
+                <select id="lang-select" onchange="window.location.href='?lang=' + this.value" style="padding: 5px 10px; margin-left: 10px; border-radius: 5px;">
+                    <option value="uz" <?php echo $current_lang === 'uz' ? 'selected' : ''; ?>>O'zbek</option>
+                    <option value="ru" <?php echo $current_lang === 'ru' ? 'selected' : ''; ?>>Русский</option>
+                </select>
+            </div>
             
             <?php if (count($employees) > 0): ?>
                 <?php foreach ($employees as $employee): ?>
@@ -137,7 +150,7 @@ $submitted_employees = $submitted_result;
                                     ?>
                                     <div class="question-group">
                                         <label class="question-label">
-                                            <?php echo htmlspecialchars($question['question_text']); ?>
+                                            <?php echo htmlspecialchars(getQuestionText($question, $current_lang)); ?>
                                         </label>
                                         
                                         <?php if ($question['question_type'] === 'rating'): ?>
