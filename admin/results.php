@@ -4,7 +4,7 @@ require_once '../includes/functions.php';
 
 // Admin tekshirish
 if (!isLoggedIn() || !isAdmin()) {
-    header('Location: ../index.php');
+    header('Location: login.php');
     exit;
 }
 

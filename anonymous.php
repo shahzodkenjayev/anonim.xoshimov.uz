@@ -1,15 +1,8 @@
 <?php
-require_once '../config/database.php';
-require_once '../includes/functions.php';
-
-// Login tekshirish
-if (!isLoggedIn() || isAdmin()) {
-    header('Location: login.php');
-    exit;
-}
+require_once 'config/database.php';
+require_once 'includes/functions.php';
 
 $conn = getDBConnection();
-$user_id = $_SESSION['user_id'];
 $message = '';
 $message_type = '';
 
@@ -23,21 +16,23 @@ $questions_query = "SELECT id, question_text, question_type, position_type FROM 
 $questions_result = $conn->query($questions_query);
 $questions = $questions_result->fetchAll();
 
+// Anonim ovoz berish uchun session yoki cookie ishlatamiz
+$session_key = 'anonymous_votes';
+if (!isset($_SESSION[$session_key])) {
+    $_SESSION[$session_key] = [];
+}
+
 // Forma yuborilganda
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $employee_id = intval($_POST['employee_id'] ?? 0);
     
     if ($employee_id > 0) {
-        // Bu talaba bu xodimga allaqachon javob berganmi?
-        $check_stmt = $conn->prepare("SELECT id FROM survey_submissions WHERE user_id = ? AND employee_id = ?");
-        $check_stmt->execute([$user_id, $employee_id]);
-        $check_result = $check_stmt->fetch();
-        
-        if ($check_result) {
-            $message = 'Siz bu xodimga allaqachon javob bergansiz!';
+        // Bu browser'dan bu xodimga allaqachon ovoz berilganmi?
+        if (in_array($employee_id, $_SESSION[$session_key])) {
+            $message = 'Siz bu xodimga allaqachon ovoz bergansiz!';
             $message_type = 'error';
         } else {
-            // Javoblarni saqlash
+            // Javoblarni saqlash (anonim, user_id = NULL)
             $conn->beginTransaction();
             try {
                 foreach ($questions as $question) {
@@ -52,16 +47,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $text_response = sanitize($_POST['question_' . $question_id] ?? '');
                     }
                     
+                    // Anonim javob - user_id NULL
                     $insert_stmt = $conn->prepare("INSERT INTO survey_responses (employee_id, question_id, rating, text_response) VALUES (?, ?, ?, ?)");
                     $insert_stmt->execute([$employee_id, $question_id, $rating, $text_response]);
                 }
                 
-                // Topshirilganligini belgilash
-                $submission_stmt = $conn->prepare("INSERT INTO survey_submissions (user_id, employee_id) VALUES (?, ?)");
-                $submission_stmt->execute([$user_id, $employee_id]);
+                // Session'da saqlash (bir marta ovoz berishni ta'minlash uchun)
+                $_SESSION[$session_key][] = $employee_id;
                 
                 $conn->commit();
-                $message = 'So\'rovnoma muvaffaqiyatli topshirildi! Rahmat!';
+                $message = 'Ovozingiz muvaffaqiyatli qabul qilindi! Rahmat!';
                 $message_type = 'success';
             } catch (Exception $e) {
                 $conn->rollBack();
@@ -71,60 +66,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-// Talaba tomonidan javob berilgan xodimlar ro'yxati
-$submitted_query = "SELECT employee_id FROM survey_submissions WHERE user_id = ?";
-$submitted_stmt = $conn->prepare($submitted_query);
-$submitted_stmt->execute([$user_id]);
-$submitted_result = $submitted_stmt->fetchAll(PDO::FETCH_COLUMN);
-$submitted_employees = $submitted_result;
 ?>
 <!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>So'rovnoma - Talaba</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Anonim Ovoz Berish</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <div class="header">
         <div class="container">
-            <h1>Anonim So'rovnoma</h1>
+            <h1>Anonim Ovoz Berish</h1>
             <div class="user-info">
-                <span><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-                <a href="../logout.php" class="btn btn-secondary">Chiqish</a>
+                <a href="index.php" class="btn btn-secondary">← Asosiy sahifa</a>
             </div>
         </div>
     </div>
     
     <div class="container">
+        <div class="anonymous-info">
+            <div class="alert alert-info">
+                <strong>ℹ️ Anonimlik:</strong> Sizning ovozingiz to'liq anonim. Login qilish shart emas. 
+                Har bir xodimga faqat bir marta ovoz bera olasiz.
+            </div>
+        </div>
+        
         <?php if ($message): ?>
             <div class="alert alert-<?php echo $message_type; ?>"><?php echo $message; ?></div>
         <?php endif; ?>
         
         <div class="survey-section">
             <h2>Xodimlarni baholash</h2>
-            <p class="info-text">Quyidagi xodimlar haqida anonim so'rovnoma to'ldiring. Har bir xodimga faqat bir marta javob bera olasiz.</p>
+            <p class="info-text">Quyidagi xodimlar haqida anonim so'rovnoma to'ldiring.</p>
             
             <?php if (count($employees) > 0): ?>
                 <?php foreach ($employees as $employee): ?>
                     <?php 
-                    $is_submitted = in_array($employee['id'], $submitted_employees);
+                    $is_voted = in_array($employee['id'], $_SESSION[$session_key] ?? []);
                     ?>
-                    <div class="employee-card <?php echo $is_submitted ? 'submitted' : ''; ?>">
+                    <div class="employee-card <?php echo $is_voted ? 'submitted' : ''; ?>">
                         <div class="employee-header">
                             <h3><?php echo htmlspecialchars($employee['full_name']); ?></h3>
                             <span class="position-badge"><?php echo getPositionName($employee['position']); ?></span>
                             <?php if ($employee['department']): ?>
                                 <span class="department"><?php echo htmlspecialchars($employee['department']); ?></span>
                             <?php endif; ?>
-                            <?php if ($is_submitted): ?>
-                                <span class="submitted-badge">✓ Topshirilgan</span>
+                            <?php if ($is_voted): ?>
+                                <span class="submitted-badge">✓ Ovoz berilgan</span>
                             <?php endif; ?>
                         </div>
                         
-                        <?php if (!$is_submitted): ?>
+                        <?php if (!$is_voted): ?>
                             <form method="POST" class="survey-form">
                                 <input type="hidden" name="employee_id" value="<?php echo $employee['id']; ?>">
                                 
@@ -155,7 +149,7 @@ $submitted_employees = $submitted_result;
                                     </div>
                                 <?php endforeach; ?>
                                 
-                                <button type="submit" class="btn btn-primary">Topshirish</button>
+                                <button type="submit" class="btn btn-primary">Ovoz Berish</button>
                             </form>
                         <?php endif; ?>
                     </div>

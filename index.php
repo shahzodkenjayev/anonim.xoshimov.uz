@@ -11,77 +11,57 @@ if (isLoggedIn()) {
     }
     exit;
 }
-
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = sanitize($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
-    
-    if (!empty($username) && !empty($password)) {
-        $conn = getDBConnection();
-        $stmt = $conn->prepare("SELECT id, username, password, full_name, role FROM users WHERE username = ?");
-        $stmt->execute([$username]);
-        $user = $stmt->fetch();
-        
-        if ($user && password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['full_name'] = $user['full_name'];
-            $_SESSION['role'] = $user['role'];
-            
-            if ($user['role'] === 'admin') {
-                header('Location: admin/dashboard.php');
-            } else {
-                header('Location: student/survey.php');
-            }
-            exit;
-        } else {
-            $error = 'Noto\'g\'ri foydalanuvchi nomi yoki parol!';
-        }
-    } else {
-        $error = 'Barcha maydonlarni to\'ldiring!';
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anonim So'rovnoma - Kirish</title>
+    <title>Anonim So'rovnoma Platformasi</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <div class="container">
-        <div class="login-box">
-            <h1>Anonim So'rovnoma Platformasi</h1>
-            <h2>Tizimga kirish</h2>
+        <div class="home-page">
+            <div class="hero-section">
+                <h1>Anonim So'rovnoma Platformasi</h1>
+                <p class="subtitle">O'qituvchilar, dekanlar va koordinatorlar haqida fikringizni bildiring</p>
+            </div>
             
-            <?php if ($error): ?>
-                <div class="alert alert-error"><?php echo $error; ?></div>
-            <?php endif; ?>
-            
-            <form method="POST" action="">
-                <div class="form-group">
-                    <label for="username">Foydalanuvchi nomi:</label>
-                    <input type="text" id="username" name="username" required autofocus>
+            <div class="options-grid">
+                <div class="option-card">
+                    <div class="option-icon">🗳️</div>
+                    <h2>Anonim Ovoz Berish</h2>
+                    <p>Xodimlar haqida anonim so'rovnoma to'ldiring. Login qilish shart emas.</p>
+                    <a href="anonymous.php" class="btn btn-primary btn-large">Ovoz Berish</a>
                 </div>
                 
-                <div class="form-group">
-                    <label for="password">Parol:</label>
-                    <input type="password" id="password" name="password" required>
+                <div class="option-card">
+                    <div class="option-icon">🔐</div>
+                    <h2>Tizimga Kirish</h2>
+                    <p>Talaba yoki admin hisobi bilan tizimga kiring va batafsil so'rovnoma to'ldiring.</p>
+                    <a href="student/login.php" class="btn btn-secondary btn-large">Kirish</a>
                 </div>
-                
-                <button type="submit" class="btn btn-primary">Kirish</button>
-            </form>
+            </div>
             
-            <div class="login-info">
-                <p><strong>Test foydalanuvchilar:</strong></p>
-                <p>Admin: admin / admin123</p>
+            <div class="info-section">
+                <h3>Qanday Ishlaydi?</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>1. Anonim Ovoz Berish</strong>
+                        <p>Login qilmasdan, to'g'ridan-to'g'ri xodimlarni baholash. Sizning shaxsingiz aniq qilinmaydi.</p>
+                    </div>
+                    <div class="info-item">
+                        <strong>2. Tizimga Kirish</strong>
+                        <p>Talaba hisobi bilan kirib, batafsil so'rovnoma to'ldiring. Har bir xodimga bir marta javob bera olasiz.</p>
+                    </div>
+                    <div class="info-item">
+                        <strong>3. Admin Panel</strong>
+                        <p>Adminlar natijalarni ko'rish va boshqarish uchun alohida sahifadan kirishadi.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

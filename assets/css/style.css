@@ -492,6 +492,139 @@ body {
   font-style: italic;
 }
 
+/* Home Page */
+.home-page {
+  background: white;
+  border-radius: 15px;
+  padding: 40px;
+  margin: 50px auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.hero-section h1 {
+  color: #667eea;
+  font-size: 42px;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.option-card {
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 40px;
+  text-align: center;
+  transition: all 0.3s;
+  border: 2px solid #e0e0e0;
+}
+
+.option-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  border-color: #667eea;
+}
+
+.option-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.option-card h2 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.option-card p {
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.btn-large {
+  padding: 15px 40px;
+  font-size: 18px;
+}
+
+.info-section {
+  margin-top: 50px;
+  padding-top: 40px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.info-section h3 {
+  color: #667eea;
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.info-item {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.info-item strong {
+  color: #667eea;
+  display: block;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.info-item p {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.anonymous-info {
+  margin-bottom: 25px;
+}
+
+.login-links {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.login-links a {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+.login-links p {
+  margin: 10px 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .header .container {
@@ -523,5 +656,27 @@ body {
   .data-table th,
   .data-table td {
     padding: 8px;
+  }
+
+  .home-page {
+    padding: 20px;
+    margin: 20px auto;
+  }
+
+  .hero-section h1 {
+    font-size: 32px;
+  }
+
+  .options-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .option-card {
+    padding: 30px 20px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
   }
 }
