@@ -3,6 +3,12 @@
     RewriteEngine On
     RewriteBase /
     
+    # Root uchun index.php ni ko'rsatish
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} ^/$
+    RewriteRule ^$ index.php [L]
+    
     # .php kengaytmasini yashirish
     # Agar URL .php bilan tugamasa va fayl mavjud bo'lsa
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -17,14 +23,12 @@
 
 # .env faylini bloklash
 <FilesMatch "\.env$">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </FilesMatch>
 
 # .env.* fayllarni bloklash (masalan: .env.local, .env.production)
 <FilesMatch "^\.env\.">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </FilesMatch>
 
 # config/ papkasini bloklash
@@ -32,11 +36,8 @@
     RewriteRule ^config/ - [F,L]
 </IfModule>
 
-# config/ papkasidagi barcha fayllarni bloklash
-<DirectoryMatch "^.*/config/">
-    Order allow,deny
-    Deny from all
-</DirectoryMatch>
+# config/ papkasidagi barcha fayllarni bloklash (DirectoryMatch ba'zi serverlarda ishlamasligi mumkin)
+# Bu qoida config/.htaccess orqali amalga oshiriladi
 
 # includes/ papkasidagi PHP fayllarni to'g'ridan-to'g'ri ochishni bloklash
 <IfModule mod_rewrite.c>
@@ -45,8 +46,7 @@
 
 # Xavfsizlik: Sensitive fayllarni bloklash
 <FilesMatch "\.(sql|log|ini|conf|bak|backup|old|tmp)$">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </FilesMatch>
 
 # Xavfsizlik: Git fayllarini bloklash
@@ -66,11 +66,12 @@
 #     Deny from all
 # </FilesMatch>
 
-# PHP xavfsizlik sozlamalari
-<IfModule mod_php7.c>
-    php_flag display_errors Off
-    php_flag log_errors On
-</IfModule>
+# PHP xavfsizlik sozlamalari (PHP versiyasiga qarab o'zgaradi)
+# Ba'zi serverlarda ishlamasligi mumkin, shuning uchun comment qilingan
+# <IfModule mod_php.c>
+#     php_flag display_errors Off
+#     php_flag log_errors On
+# </IfModule>
 
 # Directory listing ni o'chirish
 Options -Indexes

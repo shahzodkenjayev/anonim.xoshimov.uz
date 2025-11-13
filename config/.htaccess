@@ -1,4 +1,3 @@
 # config/ papkasidagi barcha fayllarni bloklash
-Order allow,deny
-Deny from all
+Require all denied
 
