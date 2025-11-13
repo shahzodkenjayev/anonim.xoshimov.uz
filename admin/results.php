@@ -12,8 +12,9 @@ if (!isLoggedIn() || !isAdmin()) {
 $conn = getDBConnection();
 
 // Barcha xodimlar va ularning natijalari
-// Javoblar sonini hisoblash: survey_submissions jadvalidan (talabalar uchun)
-// Eslatma: Anonim javoblar survey_submissions jadvaliga yozilmaydi, shuning uchun survey_responses jadvalidan ham hisoblaymiz
+// Javoblar sonini hisoblash:
+// 1. survey_submissions jadvalidan (talabalar javoblari)
+// 2. survey_responses jadvalidan (anonim javoblar - vaqt bo'yicha guruhlab)
 $results_query = "SELECT 
     e.id,
     e.full_name,
@@ -23,6 +24,17 @@ $results_query = "SELECT
         SELECT COUNT(DISTINCT ss.id)
         FROM survey_submissions ss 
         WHERE ss.employee_id = e.id
+    ) + 
+    (
+        SELECT COUNT(DISTINCT DATE(sr.submitted_at), TIME(sr.submitted_at) DIV 60)
+        FROM survey_responses sr
+        WHERE sr.employee_id = e.id
+        AND NOT EXISTS (
+            SELECT 1 FROM survey_submissions ss2
+            WHERE ss2.employee_id = sr.employee_id
+            AND DATE(ss2.submitted_at) = DATE(sr.submitted_at)
+            AND ABS(TIMESTAMPDIFF(SECOND, ss2.submitted_at, sr.submitted_at)) <= 60
+        )
     ) as total_responses,
     (
         SELECT AVG(sr.rating)
