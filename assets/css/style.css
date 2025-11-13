@@ -677,8 +677,17 @@ body {
 }
 
 .filter-group button {
-  width: 100%;
   padding: 10px 15px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+
+.filter-buttons button {
+  width: 100%;
 }
 
 .filter-results {
@@ -740,8 +749,13 @@ body {
     cursor: pointer;
   }
 
-  .filter-group button {
-    width: 100%;
+  .filter-buttons {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .filter-buttons button {
+    flex: 1;
     padding: 14px 20px;
     font-size: 16px;
     border-radius: 10px;

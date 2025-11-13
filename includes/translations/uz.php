@@ -30,6 +30,7 @@ return [
     'department' => 'Kafedra:',
     'all_departments' => 'Barcha kafedralar',
     'clear' => 'Tozalash',
+    'search' => 'Qidirish',
     'employees_found' => 'ta xodim topildi',
     'anonymity_info' => 'ℹ️ Anonimlik: Sizning ovozingiz to\'liq anonim. Login qilish shart emas. Har bir xodimga faqat bir marta ovoz bera olasiz.',
     'admin_login' => 'Adminmisiz?',

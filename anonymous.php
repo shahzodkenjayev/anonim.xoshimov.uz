@@ -149,7 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="filter-group">
+                    <div class="filter-group filter-buttons">
+                        <button type="button" id="search-btn" class="btn btn-primary"><?php echo t('search'); ?></button>
                         <button type="button" id="clear-filters" class="btn btn-secondary"><?php echo t('clear'); ?></button>
                     </div>
                 </div>
@@ -282,10 +283,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // Event listener'lar
-        searchInput.addEventListener('input', filterEmployees);
-        positionFilter.addEventListener('change', filterEmployees);
-        departmentFilter.addEventListener('change', filterEmployees);
+        // Qidirish tugmasi
+        const searchBtn = document.getElementById('search-btn');
+        searchBtn.addEventListener('click', filterEmployees);
+        
+        // Enter tugmasi bosilganda qidirish
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filterEmployees();
+            }
+        });
         
         // Tozalash tugmasi
         clearFiltersBtn.addEventListener('click', function() {
