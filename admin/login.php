@@ -77,11 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit" class="btn btn-primary">Kirish</button>
             </form>
             
-            <div class="login-info">
-                <p><strong>Test foydalanuvchi:</strong></p>
-                <p>Admin: admin / admin123</p>
-            </div>
-            
             <div class="login-links">
                 <p><a href="../index.php">← Asosiy sahifaga qaytish</a></p>
             </div>
