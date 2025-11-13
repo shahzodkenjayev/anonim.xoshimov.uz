@@ -81,8 +81,29 @@ function image($file) {
     return asset('assets/images/' . $file);
 }
 
+// URL ga timestamp qo'shish (Telegram cache uchun)
+function addCacheBuster($url, $forceNew = false) {
+    // Agar forceNew true bo'lsa, eski timestamp ni yangilaymiz
+    if ($forceNew) {
+        // Eski v yoki t parametrni olib tashlash
+        $url = preg_replace('/[?&](v|t)=\d+/', '', $url);
+        // Agar ? bilan tugasa, olib tashlash
+        $url = rtrim($url, '?&');
+    }
+    
+    // Agar URL'da allaqachon v yoki t parametri bo'lsa va forceNew false bo'lsa, o'zgartirmaymiz
+    if (!$forceNew && (strpos($url, '?v=') !== false || strpos($url, '&v=') !== false || 
+        strpos($url, '?t=') !== false || strpos($url, '&t=') !== false)) {
+        return $url;
+    }
+    
+    // Timestamp qo'shish
+    $separator = strpos($url, '?') !== false ? '&' : '?';
+    return $url . $separator . 'v=' . time();
+}
+
 // Open Graph meta teglarini yaratish
-function generateMetaTags($title, $description, $image = null, $type = 'website', $url = null) {
+function generateMetaTags($title, $description, $image = null, $type = 'website', $url = null, $addCacheBuster = true) {
     $baseUrl = getBaseUrl();
     
     // Agar URL berilmagan bo'lsa, joriy URL ni olish
@@ -91,9 +112,17 @@ function generateMetaTags($title, $description, $image = null, $type = 'website'
                      (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) 
                      ? 'https://' : 'http://';
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-        // Query string ni olib tashlash (meta teglar uchun)
-        $requestUri = strtok($requestUri, '?');
+        // Query string ni saqlab qolamiz (timestamp bo'lishi mumkin)
         $url = $protocol . $_SERVER['HTTP_HOST'] . $requestUri;
+    }
+    
+    // Telegram cache uchun timestamp qo'shish
+    // Agar URL'da allaqachon timestamp bo'lsa, uni saqlab qolamiz
+    // Agar yo'q bo'lsa, yangi timestamp qo'shamiz
+    if ($addCacheBuster) {
+        $hasTimestamp = (strpos($url, '?v=') !== false || strpos($url, '&v=') !== false || 
+                         strpos($url, '?t=') !== false || strpos($url, '&t=') !== false);
+        $url = addCacheBuster($url, false); // Eski timestamp bo'lsa, uni saqlab qolamiz
     }
     
     // Agar image berilmagan bo'lsa, default image
