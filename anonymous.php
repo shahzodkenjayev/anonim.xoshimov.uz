@@ -11,6 +11,11 @@ $employees_query = "SELECT id, full_name, position, department_uz, department_ru
 $employees_result = $conn->query($employees_query);
 $employees = $employees_result->fetchAll();
 
+// Barcha kafedralarni olish (filtrlash uchun)
+$departments_query = "SELECT DISTINCT department_uz FROM employees WHERE department_uz IS NOT NULL AND department_uz != '' ORDER BY department_uz";
+$departments_result = $conn->query($departments_query);
+$departments = $departments_result->fetchAll(PDO::FETCH_COLUMN);
+
 // Savollarni olish
 $questions_query = "SELECT id, question_text, question_type, position_type FROM questions ORDER BY id";
 $questions_result = $conn->query($questions_query);
@@ -101,12 +106,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h2>Xodimlarni baholash</h2>
             <p class="info-text">Quyidagi xodimlar haqida anonim so'rovnoma to'ldiring.</p>
             
+            <!-- Qidirish va filtrlash paneli -->
+            <div class="filter-panel">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="search-input">🔍 Xodimni qidirish:</label>
+                        <input type="text" id="search-input" class="form-control" placeholder="Ism yoki familiya bo'yicha qidiring...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="position-filter">📋 Lavozim:</label>
+                        <select id="position-filter" class="form-control">
+                            <option value="">Barcha lavozimlar</option>
+                            <option value="teacher">O'qituvchi</option>
+                            <option value="dean">Dekan</option>
+                            <option value="coordinator">Koordinator</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="department-filter">🏛️ Kafedra:</label>
+                        <select id="department-filter" class="form-control">
+                            <option value="">Barcha kafedralar</option>
+                            <?php foreach ($departments as $dept): ?>
+                                <option value="<?php echo htmlspecialchars($dept); ?>"><?php echo htmlspecialchars($dept); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button type="button" id="clear-filters" class="btn btn-secondary">Tozalash</button>
+                    </div>
+                </div>
+                <div class="filter-results">
+                    <span id="results-count"><?php echo count($employees); ?> ta xodim topildi</span>
+                </div>
+            </div>
+            
             <?php if (count($employees) > 0): ?>
                 <?php foreach ($employees as $employee): ?>
                     <?php 
                     $is_voted = in_array($employee['id'], $_SESSION[$session_key] ?? []);
                     ?>
-                    <div class="employee-card <?php echo $is_voted ? 'submitted' : ''; ?>">
+                    <div class="employee-card <?php echo $is_voted ? 'submitted' : ''; ?>" 
+                         data-name="<?php echo htmlspecialchars(strtolower($employee['full_name'])); ?>"
+                         data-position="<?php echo htmlspecialchars($employee['position']); ?>"
+                         data-department="<?php echo htmlspecialchars($employee['department_uz'] ?? ''); ?>">
                         <div class="employee-header">
                             <h3><?php echo htmlspecialchars($employee['full_name']); ?></h3>
                             <span class="position-badge"><?php echo getPositionName($employee['position']); ?></span>
@@ -159,6 +201,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
         </div>
     </div>
+    
+    <script>
+        // Qidirish va filtrlash funksiyalari
+        const searchInput = document.getElementById('search-input');
+        const positionFilter = document.getElementById('position-filter');
+        const departmentFilter = document.getElementById('department-filter');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        const resultsCount = document.getElementById('results-count');
+        const employeeCards = document.querySelectorAll('.employee-card');
+        
+        function filterEmployees() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedPosition = positionFilter.value;
+            const selectedDepartment = departmentFilter.value;
+            
+            let visibleCount = 0;
+            
+            employeeCards.forEach(card => {
+                const name = card.getAttribute('data-name') || '';
+                const position = card.getAttribute('data-position') || '';
+                const department = card.getAttribute('data-department') || '';
+                
+                // Qidirish tekshiruvi
+                const matchesSearch = !searchTerm || name.includes(searchTerm);
+                
+                // Lavozim tekshiruvi
+                const matchesPosition = !selectedPosition || position === selectedPosition;
+                
+                // Kafedra tekshiruvi
+                const matchesDepartment = !selectedDepartment || department === selectedDepartment;
+                
+                // Barcha shartlar bajarilsa, ko'rsatish
+                if (matchesSearch && matchesPosition && matchesDepartment) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Natijalar sonini yangilash
+            resultsCount.textContent = visibleCount + ' ta xodim topildi';
+            
+            // Agar hech narsa topilmasa, xabar ko'rsatish
+            if (visibleCount === 0) {
+                const noResults = document.getElementById('no-results-message');
+                if (!noResults) {
+                    const message = document.createElement('div');
+                    message.id = 'no-results-message';
+                    message.className = 'alert alert-info';
+                    message.textContent = 'Hech qanday xodim topilmadi. Filtrlarni o\'zgartiring.';
+                    document.querySelector('.survey-section').appendChild(message);
+                }
+            } else {
+                const noResults = document.getElementById('no-results-message');
+                if (noResults) {
+                    noResults.remove();
+                }
+            }
+        }
+        
+        // Event listener'lar
+        searchInput.addEventListener('input', filterEmployees);
+        positionFilter.addEventListener('change', filterEmployees);
+        departmentFilter.addEventListener('change', filterEmployees);
+        
+        // Tozalash tugmasi
+        clearFiltersBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            positionFilter.value = '';
+            departmentFilter.value = '';
+            filterEmployees();
+        });
+    </script>
 </body>
 </html>
 
