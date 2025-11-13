@@ -1,14 +1,18 @@
 <?php
 // Sidebar fayli - barcha admin sahifalarida ishlatiladi
-if (!isLoggedIn() || !isAdmin()) {
-    header('Location: login');
-    exit;
-}
+// Eslatma: Bu fayl include qilinganda, admin tekshiruvi allaqachon o'tgan bo'lishi kerak
 
 // Joriy sahifani aniqlash (active link uchun)
 $current_page = basename($_SERVER['PHP_SELF'], '.php');
 if (empty($current_page) || $current_page === 'index') {
     $current_page = 'dashboard';
+}
+
+// employee_results va student_ratings uchun alohida tekshirish
+if ($current_page === 'employee_results') {
+    $current_page = 'results';
+} elseif ($current_page === 'student_ratings') {
+    $current_page = 'add_student';
 }
 ?>
 <aside class="admin-sidebar">
